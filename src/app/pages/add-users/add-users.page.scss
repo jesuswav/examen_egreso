@@ -37,3 +37,22 @@ ion-grid {
 ion-col {
   padding: 10px;
 }
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.left-column {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.right-column {
+  flex: 1;
+  margin-right: 20px;
+}
+.right-column2 {
+  flex: 1;
+}
