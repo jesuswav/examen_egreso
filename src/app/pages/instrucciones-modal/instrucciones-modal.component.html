@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Instrucciones del Examen</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="instructions">
+    <p>Aquí van las instrucciones del examen...</p>
+  </div>
+  <ion-button expand="full" (click)="accept()">Aceptar</ion-button>
+</ion-content>
+
+<style>
+  .instructions {
+    padding: 16px;
+  }
+</style>

@@ -1,0 +1,39 @@
+ion-card {
+  margin: 10px;
+}
+
+ion-card-title {
+  font-size: 1.2em;
+  text-align: center;
+  font-weight: bold;
+  color: #3880ff;
+}
+
+ion-item {
+  --background: #f8f8f8;
+  --border-color: #dcdcdc;
+  margin-bottom: 10px;
+}
+
+ion-button {
+  margin-top: 20px;
+}
+
+ion-label {
+  font-weight: bold;
+}
+
+ion-badge {
+  --background: #3880ff;
+  --color: white;
+  font-size: 1em;
+  padding: 5px;
+}
+
+ion-grid {
+  padding: 10px;
+}
+
+ion-col {
+  padding: 10px;
+}

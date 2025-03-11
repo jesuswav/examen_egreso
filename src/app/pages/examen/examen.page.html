@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Examen del Módulo 1</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">Logout</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div id="timer" class="timer"></div>
+  <ion-list>
+    <ion-item *ngFor="let pregunta of preguntas">
+      <ion-label>
+        <h2>{{ pregunta.pregunta }}</h2>
+        <ion-radio-group>
+          <ion-item>
+            <ion-label>{{ pregunta.respuesta1 }}</ion-label>
+            <ion-radio slot="start" value="respuesta1" (ionSelect)="updateProgress(pregunta.id)"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>{{ pregunta.respuesta2 }}</ion-label>
+            <ion-radio slot="start" value="respuesta2" (ionSelect)="updateProgress(pregunta.id)"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>{{ pregunta.respuesta3 }}</ion-label>
+            <ion-radio slot="start" value="respuesta3" (ionSelect)="updateProgress(pregunta.id)"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>{{ pregunta.respuesta4 }}</ion-label>
+            <ion-radio slot="start" value="respuesta4" (ionSelect)="updateProgress(pregunta.id)"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  <ion-progress-bar id="progress-bar" value="0"></ion-progress-bar>
+  <div id="progress-text" class="progress-text">Progreso: 0/5</div>
+  <ion-button expand="full" (click)="submit()">Enviar</ion-button>
+</ion-content>
+
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="modulo1">
+      <ion-label>Módulo 1</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="modulo2">
+      <ion-label>Módulo 2</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="modulo3">
+      <ion-label>Módulo 3</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="modulo4">
+      <ion-label>Módulo 4</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="modulo5">
+      <ion-label>Módulo 5</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>

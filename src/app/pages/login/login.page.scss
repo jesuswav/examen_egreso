@@ -1,0 +1,29 @@
+.login-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.large-card {
+  width: 90%;
+  max-width: 500px;
+  background-color: #2196F3;
+  color: white;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto 20px;
+  width: 130px;
+  height: auto;
+}
+
+ion-card-title {
+  text-align: center;
+  color: white;
+}
+/*
+ion-label {
+  color: white;
+}*/

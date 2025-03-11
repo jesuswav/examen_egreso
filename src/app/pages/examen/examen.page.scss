@@ -1,0 +1,22 @@
+.examen-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin: 20px;
+}
+
+.large-card {
+  width: 90%;
+  max-width: 500px;
+  background-color: #2196F3;
+  color: white;
+  padding: 20px;
+}
+
+.logo {
+  width: 50px; /* Adjust the size as needed */
+  height: auto;
+}
+
+/* Add other styles as needed */

@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Resultados</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let resultado of resultados">
+      <ion-label>
+        <h2>{{ resultado.nombre }}</h2>
+        <p>Carrera: {{ resultado.carrera }}</p>
+        <p>Puntaje Total: {{ resultado.puntuacion_total }}</p>
+        <ion-list>
+          <ion-item *ngFor="let modulo of resultado.modulos">
+            <ion-label>
+              <h3>{{ modulo.nombre }}</h3>
+              <p>Puntaje: {{ modulo.puntuacion }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
