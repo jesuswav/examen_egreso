@@ -26,6 +26,22 @@ export class AuthService {
     return this.http.get(`${_URL_GET_PREGUNTAS_MODULO}?modulo=${modulo}`);
   }
 
+  public registerUser(data: any): Observable<any> {
+    return this.http.post('http://localhost:5000/registerUser', data);
+  }
+
+  public getRoles(): Observable<any> {
+    return this.http.get('http://localhost:5000/getRoles');
+  }
+
+  public getCarreras(): Observable<any> {
+    return this.http.get('http://localhost:5000/getCarreras');
+  }
+
+  public getAlumnosPorCarrera(): Observable<any> {
+    return this.http.get('http://localhost:5000/getAlumnosPorCarrera');
+  }
+
   public logout() {
     // Aquí puedes limpiar cualquier dato de sesión si es necesario
     console.log('Usuario deslogueado');
