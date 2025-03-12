@@ -18,10 +18,10 @@ def getUsers():
     try:
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cur.execute("""
-            SELECT usuarios.nombre, usuarios.usuario, carreras.nombre AS carrera, examenes.nombre AS examen
+            SELECT usuarios.idUsuario, usuarios.nombre, usuarios.usuario, roles.rol, carreras.carrera
             FROM usuarios
-            JOIN carreras ON usuarios.carrera_id = carreras.carrera_id
-            JOIN examenes ON carreras.examen_id = examenes.id
+            JOIN roles ON usuarios.rol = roles.idRol
+            JOIN carreras ON usuarios.idCarrera = carreras.idCarrera
         """)
         result = cur.fetchall()
         cur.close()
@@ -35,14 +35,10 @@ def getUsers():
 def getCarreras():
     try:
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("""
-            SELECT carreras.carrera_id, carreras.nombre, examenes.nombre AS examen
-            FROM carreras
-            JOIN examenes ON carreras.examen_id = examenes.id
-        """)
-        result = cur.fetchall()
+        cur.execute("SELECT idCarrera, carrera FROM carreras")
+        carreras = cur.fetchall()
         cur.close()
-        return jsonify(result)
+        return jsonify(carreras)
     except Exception as e:
         print("Error en getCarreras: ", e)
         return jsonify({"error": "Error en getCarreras"})
@@ -52,12 +48,13 @@ def getCarreras():
 def registerUser():
     try:
         data = request.json
-        name = data.get('name')
+        nombre = data.get('nombre')
         usuario = data.get('usuario')
         password = data.get('password')
-        carrera_id = data.get('carrera_id')
+        rol = data.get('rol')
+        idCarrera = data.get('idCarrera')
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO usuarios (nombre, usuario, password, carrera_id) VALUES (%s, %s, %s, %s)", (name, usuario, password, carrera_id))
+        cur.execute("INSERT INTO usuarios (nombre, usuario, password, rol, idCarrera) VALUES (%s, %s, %s, %s, %s)", (nombre, usuario, password, rol, idCarrera))
         mysql.connection.commit()
         cur.close()
         
@@ -268,6 +265,38 @@ def updatePregunta(id):
     except Exception as e:
         print("Error en updatePregunta: ", e)
         return jsonify({"error": "Error en updatePregunta"})
+
+@app.route('/getRoles', methods=['GET'])
+@cross_origin(allow_headers=['Content-Type'])
+def getRoles():
+    try:
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT idRol, rol FROM roles")
+        roles = cur.fetchall()
+        cur.close()
+        return jsonify(roles)
+    except Exception as e:
+        print("Error en getRoles: ", e)
+        return jsonify({"error": "Error en getRoles"})
+
+@app.route('/getAlumnosPorCarrera', methods=['GET'])
+@cross_origin(allow_headers=['Content-Type'])
+def getAlumnosPorCarrera():
+    try:
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("""
+            SELECT carreras.carrera, COUNT(usuarios.idUsuario) as cantidad
+            FROM usuarios
+            JOIN carreras ON usuarios.idCarrera = carreras.idCarrera
+            WHERE carreras.carrera != 'admin'
+            GROUP BY carreras.carrera
+        """)
+        result = cur.fetchall()
+        cur.close()
+        return jsonify(result)
+    except Exception as e:
+        print("Error en getAlumnosPorCarrera: ", e)
+        return jsonify({"error": "Error en getAlumnosPorCarrera"})
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)

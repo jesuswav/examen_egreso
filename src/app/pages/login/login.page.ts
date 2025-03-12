@@ -52,15 +52,12 @@ export class LoginPage {
       console.log("Authenticated:", this.authenticated);
       
       if (this.authenticated) {
-        switch (this.dataApi.rol_id) {
+        switch (this.dataApi.rol) {
           case 1: // Admin
             this.router.navigate(['/admin-tabs']);
             break;
-          case 2: // Admision
+          case 2: // Alumno
             this.router.navigate(['/examen']);
-            break;
-          case 3: // Exani
-            this.router.navigate(['/exani-tabs']);
             break;
           default:
             alert('Rol de usuario no reconocido');
@@ -80,17 +77,9 @@ export class LoginPage {
         next: (res: any) => {
           console.log("Respuesta de API:", res);
           
-          if (res && res.id) {
+          if (res && res.usuario) {
             this.dataApi = res;  // Tomamos el usuario de la respuesta
-            const isAuthenticated = data.usuario === this.dataApi.usuario && data.password === this.dataApi.password;
-            
-            if (isAuthenticated) {
-              console.log("Usuario autenticado correctamente.");
-            } else {
-              console.warn("Credenciales incorrectas.");
-            }
-
-            resolve(isAuthenticated);
+            resolve(true);
           } else {
             console.warn("No se encontraron usuarios con esas credenciales.");
             resolve(false);
