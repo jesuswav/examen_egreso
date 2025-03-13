@@ -1,9 +1,3 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Banco de Preguntas</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content>
   <ion-grid>
     <ion-row>
@@ -36,7 +30,7 @@
               </ion-item>
               <ion-item>
                 <ion-label position="floating">Respuesta Correcta</ion-label>
-                <ion-select [(ngModel)]="pregunta.respuesta_correcta" name="respuesta_correcta" required>
+                <ion-select [(ngModel)]="pregunta.respuestaCorrecta" name="respuestaCorrecta" required>
                   <ion-select-option value="1">Respuesta A</ion-select-option>
                   <ion-select-option value="2">Respuesta B</ion-select-option>
                   <ion-select-option value="3">Respuesta C</ion-select-option>
@@ -45,8 +39,8 @@
               </ion-item>
               <ion-item>
                 <ion-label position="floating">Módulo</ion-label>
-                <ion-select [(ngModel)]="pregunta.id_modulo" name="id_modulo" required>
-                  <ion-select-option *ngFor="let modulo of modulos" [value]="modulo.id">{{ modulo.nombre }}</ion-select-option>
+                <ion-select [(ngModel)]="pregunta.idModulo" name="id_modulo" required>
+                  <ion-select-option *ngFor="let modulo of modulos" [value]="modulo.idModulo">{{ modulo.modulo }}</ion-select-option>
                 </ion-select>
               </ion-item>
               <ion-button expand="full" type="submit">Agregar Pregunta</ion-button>
@@ -64,7 +58,7 @@
             <ion-item>
               <ion-label>Módulo</ion-label>
               <ion-select [(ngModel)]="selectedModulo" (ionChange)="loadPreguntas()">
-                <ion-select-option *ngFor="let modulo of modulos" [value]="modulo.id">{{ modulo.nombre }}</ion-select-option>
+                <ion-select-option *ngFor="let modulo of modulos" [value]="modulo.idModulo">{{ modulo.modulo }}</ion-select-option>
               </ion-select>
             </ion-item>
             <ion-item>
@@ -84,7 +78,7 @@
                   </ul>
                   <p>Respuesta Correcta: {{ getRespuestaCorrecta(pregunta) }}</p>
                   <ion-button (click)="editPregunta(pregunta)">Editar</ion-button>
-                  <ion-button color="danger" (click)="deletePregunta(pregunta.id)">Eliminar</ion-button>
+                  <ion-button color="danger" (click)="deletePregunta(pregunta.idPregunta)">Eliminar</ion-button>
                 </ion-label>
               </ion-item>
             </ion-list>
