@@ -1,4 +1,4 @@
-export const URL = 'http://localhost:5000/';
+export const URL = 'http://localhost:3200/';
 export const _URL_GET_USERS = URL + 'getUsers';
 export const _URL_AUTH = URL + 'getAuth';
 export const _URL_GET_RESULTADOS = URL + 'getResultados';

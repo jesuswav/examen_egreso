@@ -73,6 +73,7 @@ export class LoginPage {
 
   getUser(data: any): Promise<boolean> {
     return new Promise((resolve, reject) => {
+      console.log(data)
       this.authService.auth(data).subscribe({
         next: (res: any) => {
           console.log("Respuesta de API:", res);

@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonGrid, IonRow, IonCol, IonBadge } from '@ionic/angular/standalone';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-question-bank',
   templateUrl: './question-bank.page.html',
   styleUrls: ['./question-bank.page.scss'],
   standalone: true,
-  imports: [IonCol, IonRow, IonGrid, IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonBadge, CommonModule, FormsModule, HttpClientModule]
+  imports: [IonCol, IonRow, IonGrid, IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonBadge, CommonModule, FormsModule],
+  providers: [HttpClient] // Proporciona HttpClient aquí
 })
 export class QuestionBankPage implements OnInit {
   pregunta = {
@@ -27,34 +29,42 @@ export class QuestionBankPage implements OnInit {
   preguntas: any[] = [];
   selectedModulo: any;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient, 
+    private authService: AuthService) { }
 
   ngOnInit() {
     this.loadModulos();
   }
 
   loadModulos() {
-    this.http.get('http://localhost:5000/getModulos').subscribe((response: any) => {
-      this.modulos = response;
-    }, error => {
-      console.error('Error al cargar los módulos:', error);
+    this.authService.getModulos().subscribe({
+      next: (res: any) => {
+        console.log('Modulos: ', res)
+        this.modulos = res;
+      },
+      error: (error) => {
+        console.error("Error al obtener roles:", error);
+      }
     });
   }
 
   loadPreguntas() {
-    if (this.selectedModulo) {
-      this.http.get(`http://localhost:5000/getPreguntas?id_modulo=${this.selectedModulo}`).subscribe((response: any) => {
-        this.preguntas = response;
-      }, error => {
-        console.error('Error al cargar las preguntas:', error);
-      });
-    }
+    this.authService.getPreguntas(this.selectedModulo).subscribe({
+      next: (res: any) => {
+        console.log('Preguntas: ', res)
+        this.preguntas = res;
+      },
+      error: (error) => {
+        console.error("Error al obtener roles:", error);
+      }
+    });
   }
 
   addPregunta() {
     if (this.pregunta.id) {
       // Editar pregunta existente
-      this.http.put(`http://localhost:5000/updatePregunta/${this.pregunta.id}`, this.pregunta).subscribe(response => {
+      this.http.put(`http://localhost:3200/updatePregunta/${this.pregunta.id}`, this.pregunta).subscribe(response => {
         console.log('Pregunta actualizada:', response);
         this.loadPreguntas(); // Recargar la lista de preguntas después de actualizar una pregunta
         this.resetForm();
@@ -63,7 +73,7 @@ export class QuestionBankPage implements OnInit {
       });
     } else {
       // Agregar nueva pregunta
-      this.http.post('http://localhost:5000/addPregunta', this.pregunta).subscribe(response => {
+      this.http.post('http://localhost:3200/addPregunta', this.pregunta).subscribe(response => {
         console.log('Pregunta agregada:', response);
         this.loadPreguntas(); // Recargar la lista de preguntas después de agregar una nueva
         this.resetForm();
@@ -78,7 +88,7 @@ export class QuestionBankPage implements OnInit {
   }
 
   deletePregunta(id: number) {
-    this.http.delete(`http://localhost:5000/deletePregunta/${id}`).subscribe(response => {
+    this.http.delete(`http://localhost:3200/deletePregunta/${id}`).subscribe(response => {
       console.log('Pregunta eliminada:', response);
       this.loadPreguntas(); // Recargar la lista de preguntas después de eliminar una pregunta
     }, error => {

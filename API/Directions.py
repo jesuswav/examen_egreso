@@ -1,47 +1,74 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
-from flask_mysqldb import MySQL, MySQLdb
+#from flask_mysqldb import MySQL, MySQLdb
+import pymysql
 
 app = Flask(__name__)
 CORS(app)
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'admision_utcalvillo'
+#app.config['MYSQL_HOST'] = 'localhost'
+#app.config['MYSQL_USER'] = 'root'
+#app.config['MYSQL_PASSWORD'] = ''
+#app.config['MYSQL_DB'] = 'admision_utcalvillo'
 
-mysql = MySQL(app)
+#mysql = MySQL(app)
+
+# Configurar conexión manualmente
+"""db = pymysql.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="examen_egreso",
+    cursorclass=pymysql.cursors.DictCursor
+)"""
+
+def execute_query(query, params=None):
+    try:
+        db = pymysql.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="examen_egreso",
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        cursor = db.cursor()
+        cursor.execute(query, params or ())
+        resultado = cursor.fetchall()
+        db.commit()  # Confirmar cambios si es una consulta de escritura
+        return resultado
+    except pymysql.MySQLError as e:
+        print(f"Error en la consulta: {e}")
+        return None
+    finally:
+        cursor.close()
+        db.close()  # Asegurar que siempre cerramos la conexión
 
 @app.route('/getUsers', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
 def getUsers():
     try:
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("""
+        result = execute_query("""
             SELECT usuarios.idUsuario, usuarios.nombre, usuarios.usuario, roles.rol, carreras.carrera
             FROM usuarios
             JOIN roles ON usuarios.rol = roles.idRol
             JOIN carreras ON usuarios.idCarrera = carreras.idCarrera
         """)
-        result = cur.fetchall()
-        cur.close()
         return jsonify(result)
     except Exception as e:
         print("Error en getUsers: ", e)
         return jsonify({"error": "Error en getUsers"})
+        
 
 @app.route('/getCarreras', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
 def getCarreras():
     try:
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("SELECT idCarrera, carrera FROM carreras")
-        carreras = cur.fetchall()
-        cur.close()
+        carreras = execute_query("SELECT idCarrera, carrera FROM carreras")
         return jsonify(carreras)
     except Exception as e:
         print("Error en getCarreras: ", e)
         return jsonify({"error": "Error en getCarreras"})
+        
 
 @app.route('/registerUser', methods=['POST'])
 @cross_origin(allow_headers=['Content-Type'])
@@ -53,15 +80,14 @@ def registerUser():
         password = data.get('password')
         rol = data.get('rol')
         idCarrera = data.get('idCarrera')
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO usuarios (nombre, usuario, password, rol, idCarrera) VALUES (%s, %s, %s, %s, %s)", (nombre, usuario, password, rol, idCarrera))
-        mysql.connection.commit()
-        cur.close()
+        ## ejecutar la consulta
+        execute_query("INSERT INTO usuarios (nombre, usuario, password, rol, idCarrera) VALUES (%s, %s, %s, %s, %s)", (nombre, usuario, password, rol, idCarrera))
         
         return jsonify({"message": "Usuario registrado exitosamente"})
     except Exception as e:
         print("Error en registerUser: ", e)
         return jsonify({"error": "Error en registerUser"})
+        
 
 @app.route('/getAuth', methods=['POST'])
 @cross_origin(allow_headers=['Content-Type'])
@@ -70,17 +96,18 @@ def getAuth():
         data = request.get_json()
         usuario = data['usuario']
         password = data['password']
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("SELECT * FROM usuarios WHERE usuario = %s AND password = %s", (usuario, password))
-        user = cur.fetchone()
-        cur.close()
+        ## ejecutar la consulta
+        user = execute_query("SELECT * FROM usuarios WHERE usuario = %s AND password = %s", (usuario, password))
+
         if user:
-            return jsonify(user)
+            return user[0]
         else:
             return jsonify({"error": "Usuario o contraseña inválidos"})
+        
     except Exception as e:
         print("Error en getAuth: ", e)
         return jsonify({"error": "Error en getAuth"})
+        
 
 @app.route('/addPregunta', methods=['POST'])
 @cross_origin(allow_headers=['Content-Type'])
@@ -94,49 +121,48 @@ def addPregunta():
         respuesta4 = data.get('respuesta4')
         respuesta_correcta = data.get('respuesta_correcta')
         id_modulo = data.get('id_modulo')
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO preguntas (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuesta_correcta, id_modulo) VALUES (%s, %s, %s, %s, %s, %s, %s)", (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuesta_correcta, id_modulo))
-        mysql.connection.commit()
-        cur.close()
-        
+        # ejecutar consulta
+        execute_query("INSERT INTO preguntas (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuesta_correcta, id_modulo) VALUES (%s, %s, %s, %s, %s, %s, %s)", (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuesta_correcta, id_modulo))
+
         return jsonify({"message": "Pregunta agregada exitosamente"})
     except Exception as e:
         print("Error en addPregunta: ", e)
         return jsonify({"error": "Error en addPregunta"})
+        
 
 @app.route('/getPreguntas', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
 def getPreguntas():
     try:
         id_modulo = request.args.get('id_modulo')
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        # ejecutar consulta
         if id_modulo:
-            cur.execute("""
+            result = execute_query("""
                 SELECT preguntas.id, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuesta_correcta, modulos.nombre AS modulo
                 FROM preguntas
                 JOIN modulos ON preguntas.id_modulo = modulos.id
                 WHERE preguntas.id_modulo = %s
             """, (id_modulo,))
         else:
-            cur.execute("""
+            result = execute_query("""
                 SELECT preguntas.id, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuesta_correcta, modulos.nombre AS modulo
                 FROM preguntas
                 JOIN modulos ON preguntas.id_modulo = modulos.id
             """)
-        result = cur.fetchall()
-        cur.close()
         return jsonify(result)
     except Exception as e:
         print("Error en getPreguntas: ", e)
         return jsonify({"error": "Error en getPreguntas"})
+        
 
 @app.route('/getPreguntasModulo1', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
 def getPreguntasModulo1():
     try:
         usuario_id = request.args.get('usuario_id')
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("""
+        # ejecutar consulta
+        result = execute_query("""
             SELECT preguntas.id, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuesta_correcta
             FROM preguntas
             JOIN modulos ON preguntas.id_modulo = modulos.id
@@ -145,25 +171,23 @@ def getPreguntasModulo1():
             JOIN usuarios ON carreras.carrera_id = usuarios.carrera_id
             WHERE usuarios.id = %s AND modulos.nombre = 'Modulo 1'
         """, (usuario_id,))
-        result = cur.fetchall()
-        cur.close()
         return jsonify(result)
     except Exception as e:
         print("Error en getPreguntasModulo1: ", e)
         return jsonify({"error": "Error en getPreguntasModulo1"})
+        
 
 @app.route('/deletePregunta/<int:id>', methods=['DELETE'])
 @cross_origin(allow_headers=['Content-Type'])
 def deletePregunta(id):
     try:
-        cur = mysql.connection.cursor()
-        cur.execute("DELETE FROM preguntas WHERE id = %s", (id,))
-        mysql.connection.commit()
-        cur.close()
+        execute_query("DELETE FROM preguntas WHERE id = %s", (id,))
         return jsonify({"message": "Pregunta eliminada exitosamente"})
     except Exception as e:
         print("Error en deletePregunta: ", e)
         return jsonify({"error": "Error en deletePregunta"})
+        
+
 @app.route('/addModulo', methods=['POST'])
 @cross_origin(allow_headers=['Content-Type'])
 def addModulo():
@@ -171,52 +195,48 @@ def addModulo():
         data = request.json
         nombre = data.get('nombre')
         examen_id = data.get('examen_id')
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO modulos (nombre) VALUES (%s)", (nombre,))
-        modulo_id = cur.lastrowid
-        cur.execute("INSERT INTO examenes_modulos (examen_id, modulo_id) VALUES (%s, %s)", (examen_id, modulo_id))
-        mysql.connection.commit()
-        cur.close()
+
+        execute_query("INSERT INTO modulos (nombre) VALUES (%s)", (nombre,))
+        execute_query("INSERT INTO examenes_modulos (examen_id, modulo_id) VALUES (%s, %s)", (examen_id, modulo_id))
         
         return jsonify({"message": "Módulo agregado exitosamente"})
     except Exception as e:
         print("Error en addModulo: ", e)
         return jsonify({"error": "Error en addModulo"})
+        
+
 @app.route('/getModulos', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
 def getModulos():
     try:
         examen_id = request.args.get('examen_id')
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        # ejecutar la consulta
         if examen_id:
-            cur.execute("""
+            result = execute_query("""
                 SELECT modulos.id, modulos.nombre
                 FROM modulos
                 JOIN examenes_modulos ON modulos.id = examenes_modulos.modulo_id
                 WHERE examenes_modulos.examen_id = %s
             """, (examen_id,))
         else:
-            cur.execute("SELECT * FROM modulos")
-        result = cur.fetchall()
-        cur.close()
+            result = execute_query("SELECT * FROM modulos")
         return jsonify(result)
     except Exception as e:
         print("Error en getModulos: ", e)
         return jsonify({"error": "Error en getModulos"})   
+        
+
 @app.route('/getResultados', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
 def getResultados():
     try:
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("""
+        data = execute_query("""
             SELECT usuarios.nombre, carreras.nombre AS carrera, examenes.nombre AS examen, resultados.modulo1, resultados.modulo2, resultados.modulo3, resultados.modulo4, resultados.modulo5, resultados.puntuacion_total
             FROM resultados
             JOIN usuarios ON resultados.usuario_id = usuarios.id
             JOIN carreras ON usuarios.carrera_id = carreras.carrera_id
             JOIN examenes ON carreras.examen_id = examenes.id
         """)
-        data = cur.fetchall()
-        cur.close()
 
         # Transform data into the desired format
         resultados = []
@@ -240,6 +260,8 @@ def getResultados():
     except Exception as e:
         print("Error en getResultados: ", e)
         return jsonify({"error": "Error en getResultados"})
+        
+
 @app.route('/updatePregunta/<int:id>', methods=['PUT'])
 @cross_origin(allow_headers=['Content-Type'])
 def updatePregunta(id):
@@ -252,51 +274,46 @@ def updatePregunta(id):
         respuesta4 = data.get('respuesta4')
         respuesta_correcta = data.get('respuesta_correcta')
         id_modulo = data.get('id_modulo')
-        cur = mysql.connection.cursor()
-        cur.execute("""
+        ## Ejecutar consulta
+        execute_query("""
             UPDATE preguntas
             SET pregunta = %s, respuesta1 = %s, respuesta2 = %s, respuesta3 = %s, respuesta4 = %s, respuesta_correcta = %s, id_modulo = %s
             WHERE id = %s
         """, (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuesta_correcta, id_modulo, id))
-        mysql.connection.commit()
-        cur.close()
         
         return jsonify({"message": "Pregunta actualizada exitosamente"})
     except Exception as e:
         print("Error en updatePregunta: ", e)
         return jsonify({"error": "Error en updatePregunta"})
+        
 
 @app.route('/getRoles', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
 def getRoles():
     try:
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("SELECT idRol, rol FROM roles")
-        roles = cur.fetchall()
-        cur.close()
+        roles = execute_query("SELECT idRol, rol FROM roles")
         return jsonify(roles)
     except Exception as e:
         print("Error en getRoles: ", e)
         return jsonify({"error": "Error en getRoles"})
+        
 
 @app.route('/getAlumnosPorCarrera', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
 def getAlumnosPorCarrera():
     try:
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("""
+        result = execute_query("""
             SELECT carreras.carrera, COUNT(usuarios.idUsuario) as cantidad
             FROM usuarios
             JOIN carreras ON usuarios.idCarrera = carreras.idCarrera
             WHERE carreras.carrera != 'admin'
             GROUP BY carreras.carrera
         """)
-        result = cur.fetchall()
-        cur.close()
         return jsonify(result)
     except Exception as e:
         print("Error en getAlumnosPorCarrera: ", e)
         return jsonify({"error": "Error en getAlumnosPorCarrera"})
+        
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=3200, debug=True)
