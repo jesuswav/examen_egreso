@@ -46,7 +46,7 @@
               <ion-item>
                 <ion-label position="floating">Módulo</ion-label>
                 <ion-select [(ngModel)]="pregunta.id_modulo" name="id_modulo" required>
-                  <ion-select-option *ngFor="let modulo of modulos" [value]="modulo.id">{{ modulo.nombre }}</ion-select-option>
+                  <ion-select-option *ngFor="let modulo of modulos" [value]="modulo.idModulo">{{ modulo.modulo }}</ion-select-option>
                 </ion-select>
               </ion-item>
               <ion-button expand="full" type="submit">Agregar Pregunta</ion-button>
@@ -64,7 +64,7 @@
             <ion-item>
               <ion-label>Módulo</ion-label>
               <ion-select [(ngModel)]="selectedModulo" (ionChange)="loadPreguntas()">
-                <ion-select-option *ngFor="let modulo of modulos" [value]="modulo.id">{{ modulo.modulo }}</ion-select-option>
+                <ion-select-option *ngFor="let modulo of modulos" [value]="modulo.idModulo">{{ modulo.modulo }}</ion-select-option>
               </ion-select>
             </ion-item>
             <ion-item>

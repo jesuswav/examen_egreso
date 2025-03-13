@@ -2,7 +2,27 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonGrid, IonRow, IonCol, IonBadge } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonButton,
+  IonSelect,
+  IonSelectOption,
+  IonList,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonBadge,
+} from '@ionic/angular/standalone';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -10,8 +30,30 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './question-bank.page.html',
   styleUrls: ['./question-bank.page.scss'],
   standalone: true,
-  imports: [IonCol, IonRow, IonGrid, IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonBadge, CommonModule, FormsModule],
-  providers: [HttpClient] // Proporciona HttpClient aquí
+  imports: [
+    IonCol,
+    IonRow,
+    IonGrid,
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonButton,
+    IonSelect,
+    IonSelectOption,
+    IonList,
+    IonBadge,
+    CommonModule,
+    FormsModule,
+  ],
+  providers: [HttpClient], // Proporciona HttpClient aquí
 })
 export class QuestionBankPage implements OnInit {
   pregunta = {
@@ -22,16 +64,14 @@ export class QuestionBankPage implements OnInit {
     respuesta3: '',
     respuesta4: '',
     respuesta_correcta: '',
-    id_modulo: ''
+    id_modulo: 0,
   };
 
   modulos: any[] = [];
   preguntas: any[] = [];
   selectedModulo: any;
 
-  constructor(
-    private http: HttpClient, 
-    private authService: AuthService) { }
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit() {
     this.loadModulos();
@@ -40,45 +80,52 @@ export class QuestionBankPage implements OnInit {
   loadModulos() {
     this.authService.getModulos().subscribe({
       next: (res: any) => {
-        console.log('Modulos: ', res)
+        console.log('Modulos: ', res);
         this.modulos = res;
       },
       error: (error) => {
-        console.error("Error al obtener roles:", error);
-      }
+        console.error('Error al obtener los modulos:', error);
+      },
     });
   }
 
   loadPreguntas() {
+    console.log(this.selectedModulo)
     this.authService.getPreguntas(this.selectedModulo).subscribe({
       next: (res: any) => {
-        console.log('Preguntas: ', res)
+        console.log('Preguntas: ', res);
         this.preguntas = res;
       },
       error: (error) => {
-        console.error("Error al obtener roles:", error);
-      }
+        console.error('Error al obtener las preguntas:', error);
+      },
     });
   }
 
   addPregunta() {
+    console.log('pregunta: ', this.pregunta.id)
     if (this.pregunta.id) {
-      // Editar pregunta existente
-      this.http.put(`http://localhost:3200/updatePregunta/${this.pregunta.id}`, this.pregunta).subscribe(response => {
-        console.log('Pregunta actualizada:', response);
-        this.loadPreguntas(); // Recargar la lista de preguntas después de actualizar una pregunta
-        this.resetForm();
-      }, error => {
-        console.error('Error al actualizar pregunta:', error);
+      this.authService.updatePregunta(this.pregunta).subscribe({
+        next: (res: any) => {
+          console.log('Pregunta actualizada:', res);
+          this.loadPreguntas(); // Recargar la lista de preguntas después de actualizar una pregunta
+          this.resetForm();
+        },
+        error: (error) => {
+          console.error('Error al actualizar pregunta:', error);
+        },
       });
     } else {
-      // Agregar nueva pregunta
-      this.http.post('http://localhost:3200/addPregunta', this.pregunta).subscribe(response => {
-        console.log('Pregunta agregada:', response);
-        this.loadPreguntas(); // Recargar la lista de preguntas después de agregar una nueva
-        this.resetForm();
-      }, error => {
-        console.error('Error al agregar pregunta:', error);
+      console.log(this.pregunta)
+      this.authService.addPregunta(this.pregunta).subscribe({
+        next: (res: any) => {
+          console.log('Pregunta agregada:', res);
+          this.loadPreguntas(); // Recargar la lista de preguntas después de agregar una nueva
+          this.resetForm();
+        },
+        error: (error) => {
+          console.error('Error al agregar pregunta:', error);
+        },
       });
     }
   }
@@ -88,11 +135,14 @@ export class QuestionBankPage implements OnInit {
   }
 
   deletePregunta(id: number) {
-    this.http.delete(`http://localhost:3200/deletePregunta/${id}`).subscribe(response => {
-      console.log('Pregunta eliminada:', response);
-      this.loadPreguntas(); // Recargar la lista de preguntas después de eliminar una pregunta
-    }, error => {
-      console.error('Error al eliminar pregunta:', error);
+    this.authService.deletePregunta(id).subscribe({
+      next: (res: any) => {
+        console.log('Pregunta eliminada:', res);
+        this.loadPreguntas(); // Recargar la lista de preguntas después de eliminar una pregunta
+      },
+      error: (error) => {
+        console.error('Error al obtener roles:', error);
+      },
     });
   }
 
@@ -105,7 +155,7 @@ export class QuestionBankPage implements OnInit {
       respuesta3: '',
       respuesta4: '',
       respuesta_correcta: '',
-      id_modulo: ''
+      id_modulo: 0,
     };
   }
 

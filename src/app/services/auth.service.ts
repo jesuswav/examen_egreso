@@ -46,8 +46,20 @@ export class AuthService {
     return this.http.get('http://localhost:3200/getModulos');
   }
 
-  public getPreguntas(selectedModulo: string) : Observable<any> {
+  public getPreguntas(selectedModulo: string): Observable<any> {
     return this.http.get(`http://localhost:3200/getPreguntas?id_modulo=${selectedModulo}`)
+  }
+
+  public addPregunta(pregunta: any): Observable<any> {
+    return this.http.post(`http://localhost:3200/addPregunta`, pregunta)
+  }
+
+  public updatePregunta(pregunta: any): Observable<any> {
+    return this.http.put(`http://localhost:3200/updatePregunta/${pregunta.id}`, pregunta)
+  }
+
+  public deletePregunta(id: any): Observable<any> {
+    return this.http.delete(`http://localhost:3200/deletePregunta/${id}`)
   }
 
   public logout() {
