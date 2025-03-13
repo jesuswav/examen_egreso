@@ -2,7 +2,27 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonGrid, IonRow, IonCol, IonBadge } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonButton,
+  IonSelect,
+  IonSelectOption,
+  IonList,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonBadge,
+} from '@ionic/angular/standalone';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -10,8 +30,30 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './question-bank.page.html',
   styleUrls: ['./question-bank.page.scss'],
   standalone: true,
-  imports: [IonCol, IonRow, IonGrid, IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonBadge, CommonModule, FormsModule],
-  providers: [HttpClient] // Proporciona HttpClient aquí
+  imports: [
+    IonCol,
+    IonRow,
+    IonGrid,
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonButton,
+    IonSelect,
+    IonSelectOption,
+    IonList,
+    IonBadge,
+    CommonModule,
+    FormsModule,
+  ],
+  providers: [HttpClient], // Proporciona HttpClient aquí
 })
 export class QuestionBankPage implements OnInit {
   pregunta = {
@@ -29,9 +71,7 @@ export class QuestionBankPage implements OnInit {
   preguntas: any[] = [];
   selectedModulo: any;
 
-  constructor(
-    private http: HttpClient, 
-    private authService: AuthService) { }
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit() {
     this.loadModulos();
@@ -40,24 +80,25 @@ export class QuestionBankPage implements OnInit {
   loadModulos() {
     this.authService.getModulos().subscribe({
       next: (res: any) => {
-        console.log('Modulos: ', res)
+        console.log('Modulos: ', res);
         this.modulos = res;
       },
       error: (error) => {
-        console.error("Error al obtener roles:", error);
-      }
+        console.error('Error al obtener los modulos:', error);
+      },
     });
   }
 
   loadPreguntas() {
+    console.log(this.selectedModulo)
     this.authService.getPreguntas(this.selectedModulo).subscribe({
       next: (res: any) => {
-        console.log('Preguntas: ', res)
+        console.log('Preguntas: ', res);
         this.preguntas = res;
       },
       error: (error) => {
-        console.error("Error al obtener roles:", error);
-      }
+        console.error('Error al obtener las preguntas:', error);
+      },
     });
   }
 
@@ -88,11 +129,14 @@ export class QuestionBankPage implements OnInit {
   }
 
   deletePregunta(id: number) {
-    this.http.delete(`http://localhost:3200/deletePregunta/${id}`).subscribe(response => {
-      console.log('Pregunta eliminada:', response);
-      this.loadPreguntas(); // Recargar la lista de preguntas después de eliminar una pregunta
-    }, error => {
-      console.error('Error al eliminar pregunta:', error);
+    this.authService.deletePregunta(id).subscribe({
+      next: (res: any) => {
+        console.log('Pregunta eliminada:', res);
+        this.loadPreguntas(); // Recargar la lista de preguntas después de eliminar una pregunta
+      },
+      error: (error) => {
+        console.error('Error al obtener roles:', error);
+      },
     });
   }
 

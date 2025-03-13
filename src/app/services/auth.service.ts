@@ -46,7 +46,7 @@ export class AuthService {
     return this.http.get('http://localhost:3200/getModulos');
   }
 
-  public getPreguntas(selectedModulo: string) : Observable<any> {
+  public getPreguntas(selectedModulo: string): Observable<any> {
     return this.http.get(`http://localhost:3200/getPreguntas?id_modulo=${selectedModulo}`)
   }
 

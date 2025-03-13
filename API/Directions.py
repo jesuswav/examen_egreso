@@ -114,6 +114,7 @@ def getAuth():
 def addPregunta():
     try:
         data = request.json
+        print('-----------', data)
         pregunta = data.get('pregunta')
         respuesta1 = data.get('respuesta1')
         respuesta2 = data.get('respuesta2')
@@ -122,7 +123,7 @@ def addPregunta():
         respuesta_correcta = data.get('respuesta_correcta')
         id_modulo = data.get('id_modulo')
         # ejecutar consulta
-        execute_query("INSERT INTO preguntas (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuesta_correcta, id_modulo) VALUES (%s, %s, %s, %s, %s, %s, %s)", (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuesta_correcta, id_modulo))
+        execute_query("INSERT INTO preguntas (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuestaCorrecta, idModulo) VALUES (%s, %s, %s, %s, %s, %s, %s)", (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuesta_correcta, id_modulo))
 
         return jsonify({"message": "Pregunta agregada exitosamente"})
     except Exception as e:
@@ -139,14 +140,14 @@ def getPreguntas():
         # ejecutar consulta
         if id_modulo:
             result = execute_query("""
-                SELECT preguntas.id, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuesta_correcta, modulos.nombre AS modulo
+                SELECT preguntas.idPregunta, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuestaCorrecta, modulos.modulo AS modulo
                 FROM preguntas
                 JOIN modulos ON preguntas.idModulo = modulos.idModulo
                 WHERE preguntas.idModulo = %s
             """, (idModulo,))
         else:
             result = execute_query("""
-                SELECT preguntas.id, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuesta_correcta, modulos.nombre AS modulo
+                SELECT preguntas.idPregunta, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuestaCorrecta, modulos.modulo AS modulo
                 FROM preguntas
                 JOIN modulos ON preguntas.idModulo = modulos.idModulo
             """)
