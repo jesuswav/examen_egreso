@@ -27,27 +27,31 @@ export class AuthService {
   }
 
   public registerUser(data: any): Observable<any> {
-    return this.http.post('http://localhost:5000/registerUser', data);
+    return this.http.post('http://localhost:3200/registerUser', data);
   }
 
   public getRoles(): Observable<any> {
-    return this.http.get('http://localhost:5000/getRoles');
+    return this.http.get('http://localhost:3200/getRoles');
   }
 
   public getCarreras(): Observable<any> {
-    return this.http.get('http://localhost:5000/getCarreras');
+    return this.http.get('http://localhost:3200/getCarreras');
   }
 
   public getAlumnosPorCarrera(): Observable<any> {
-    return this.http.get('http://localhost:5000/getAlumnosPorCarrera');
+    return this.http.get('http://localhost:3200/getAlumnosPorCarrera');
+  }
+
+  public getModulos(): Observable<any> {
+    return this.http.get('http://localhost:3200/getModulos');
+  }
+
+  public getPreguntas(selectedModulo: string) : Observable<any> {
+    return this.http.get(`http://localhost:3200/getPreguntas?id_modulo=${selectedModulo}`)
   }
 
   public addPregunta(data: any): Observable<any> {
     return this.http.post('http://localhost:5000/addPregunta', data);
-  }
-
-  public getModulos(): Observable<any> {
-    return this.http.get('http://localhost:5000/getModulos');
   }
 
   public addModulo(data: any): Observable<any> {

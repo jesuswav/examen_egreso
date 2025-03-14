@@ -93,6 +93,7 @@ export class AddUsersPage implements OnInit, AfterViewInit {
   loadUsers() {
     this.authService.getUsers().subscribe({
       next: (res: any) => {
+        console.log(res)
         this.usuarios = res;
       },
       error: (error) => {
@@ -106,6 +107,7 @@ export class AddUsersPage implements OnInit, AfterViewInit {
       next: (res: any) => {
         this.alumnosPorCarrera = res;
         this.updatePieChart();
+        console.log(this.alumnosPorCarrera);
       },
       error: (error) => {
         console.error("Error al obtener alumnos por carrera:", error);
