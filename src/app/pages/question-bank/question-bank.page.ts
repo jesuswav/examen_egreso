@@ -90,7 +90,7 @@ export class QuestionBankPage implements OnInit {
   }
 
   loadPreguntas() {
-    console.log(this.selectedModulo)
+    console.log('Selected modulo', this.selectedModulo)
     this.authService.getPreguntas(this.selectedModulo).subscribe({
       next: (res: any) => {
         console.log('Preguntas: ', res);

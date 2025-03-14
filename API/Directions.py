@@ -135,10 +135,10 @@ def addPregunta():
 @cross_origin(allow_headers=['Content-Type'])
 def getPreguntas():
     try:
-        id_modulo = request.args.get('id_modulo')
+        idModulo = request.args.get('id_modulo')
 
         # ejecutar consulta
-        if id_modulo:
+        if idModulo:
             result = execute_query("""
                 SELECT preguntas.idPregunta, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuestaCorrecta, modulos.modulo AS modulo
                 FROM preguntas
@@ -151,6 +151,7 @@ def getPreguntas():
                 FROM preguntas
                 JOIN modulos ON preguntas.idModulo = modulos.idModulo
             """)
+            print('Hola')
         return jsonify(result)
     except Exception as e:
         print("Error en getPreguntas: ", e)
@@ -176,17 +177,6 @@ def getPreguntasModulo1():
     except Exception as e:
         print("Error en getPreguntasModulo1: ", e)
         return jsonify({"error": "Error en getPreguntasModulo1"})
-        
-
-@app.route('/deletePregunta/<int:id>', methods=['DELETE'])
-@cross_origin(allow_headers=['Content-Type'])
-def deletePregunta(id):
-    try:
-        execute_query("DELETE FROM preguntas WHERE id = %s", (id,))
-        return jsonify({"message": "Pregunta eliminada exitosamente"})
-    except Exception as e:
-        print("Error en deletePregunta: ", e)
-        return jsonify({"error": "Error en deletePregunta"})
         
 @app.route('/addModulo', methods=['POST'])
 @cross_origin(allow_headers=['Content-Type'])
@@ -323,14 +313,12 @@ def editPregunta():
         respuesta4 = data.get('respuesta4')
         respuestaCorrecta = data.get('respuestaCorrecta')
         idModulo = data.get('idModulo')
-        cur = mysql.connection.cursor()
-        cur.execute("""
+        ## ejecutar consulta
+        execute_query("""
             UPDATE preguntas
             SET pregunta = %s, respuesta1 = %s, respuesta2 = %s, respuesta3 = %s, respuesta4 = %s, respuestaCorrecta = %s, idModulo = %s
             WHERE idPregunta = %s
         """, (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuestaCorrecta, idModulo, idPregunta))
-        mysql.connection.commit()
-        cur.close()
         return jsonify({"message": "Pregunta actualizada exitosamente"})
     except Exception as e:
         print("Error en editPregunta: ", e)
@@ -340,10 +328,7 @@ def editPregunta():
 @cross_origin(allow_headers=['Content-Type'])
 def deletePregunta(idPregunta):
     try:
-        cur = mysql.connection.cursor()
-        cur.execute("DELETE FROM preguntas WHERE idPregunta = %s", (idPregunta,))
-        mysql.connection.commit()
-        cur.close()
+        execute_query("DELETE FROM preguntas WHERE idPregunta = %s", (idPregunta,))
         return jsonify({"message": "Pregunta eliminada exitosamente"})
     except Exception as e:
         print("Error en deletePregunta: ", e)
@@ -353,10 +338,7 @@ def deletePregunta(idPregunta):
 @cross_origin(allow_headers=['Content-Type'])
 def deleteModulo(idModulo):
     try:
-        cur = mysql.connection.cursor()
-        cur.execute("DELETE FROM modulos WHERE idModulo = %s", (idModulo,))
-        mysql.connection.commit()
-        cur.close()
+        execute_query("DELETE FROM modulos WHERE idModulo = %s", (idModulo,))
         return jsonify({"message": "Módulo eliminado exitosamente"})
     except Exception as e:
         print("Error en deleteModulo: ", e)
@@ -369,10 +351,7 @@ def editModulo():
         data = request.json
         idModulo = data.get('idModulo')
         modulo = data.get('modulo')
-        cur = mysql.connection.cursor()
-        cur.execute("UPDATE modulos SET modulo = %s WHERE idModulo = %s", (modulo, idModulo))
-        mysql.connection.commit()
-        cur.close()
+        execute_query("UPDATE modulos SET modulo = %s WHERE idModulo = %s", (modulo, idModulo))
         return jsonify({"message": "Módulo actualizado exitosamente"})
     except Exception as e:
         print("Error en editModulo: ", e)
