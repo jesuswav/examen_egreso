@@ -3,73 +3,96 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonGrid, IonRow, IonCol, IonBadge } from '@ionic/angular/standalone';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-question-bank',
   templateUrl: './question-bank.page.html',
   styleUrls: ['./question-bank.page.scss'],
   standalone: true,
-  imports: [IonCol, IonRow, IonGrid, IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonBadge, CommonModule, FormsModule, HttpClientModule]
+  imports: [IonCol, IonRow, IonGrid, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonBadge, CommonModule, FormsModule, HttpClientModule]
 })
 export class QuestionBankPage implements OnInit {
   pregunta = {
-    id: null,
+    idPregunta: null,
     pregunta: '',
     respuesta1: '',
     respuesta2: '',
     respuesta3: '',
     respuesta4: '',
-    respuesta_correcta: '',
-    id_modulo: ''
+    respuestaCorrecta: '',
+    idModulo: ''
   };
 
   modulos: any[] = [];
   preguntas: any[] = [];
   selectedModulo: any;
 
-  constructor(private http: HttpClient) { }
+  constructor(private authService: AuthService) {}
 
   ngOnInit() {
     this.loadModulos();
   }
 
   loadModulos() {
-    this.http.get('http://localhost:5000/getModulos').subscribe((response: any) => {
-      this.modulos = response;
-    }, error => {
-      console.error('Error al cargar los módulos:', error);
+    this.authService.getModulos().subscribe({
+      next: (res: any) => {
+        this.modulos = res;
+      },
+      error: (error) => {
+        console.error("Error al obtener módulos:", error);
+      }
     });
   }
 
-  loadPreguntas() {
-    if (this.selectedModulo) {
-      this.http.get(`http://localhost:5000/getPreguntas?id_modulo=${this.selectedModulo}`).subscribe((response: any) => {
-        this.preguntas = response;
-      }, error => {
-        console.error('Error al cargar las preguntas:', error);
+  addPregunta() {
+    if (this.pregunta.idPregunta) {
+      this.authService.editPregunta(this.pregunta).subscribe({
+        next: (res: any) => {
+          alert(res.message);
+          this.loadPreguntas();
+          this.resetPregunta();
+        },
+        error: (error) => {
+          console.error("Error al editar pregunta:", error);
+          alert("Error al editar pregunta, intenta de nuevo.");
+        }
+      });
+    } else {
+      this.authService.addPregunta(this.pregunta).subscribe({
+        next: (res: any) => {
+          alert(res.message);
+          this.loadPreguntas();
+          this.resetPregunta();
+        },
+        error: (error) => {
+          console.error("Error al agregar pregunta:", error);
+          alert("Error al agregar pregunta, intenta de nuevo.");
+        }
       });
     }
   }
 
-  addPregunta() {
-    if (this.pregunta.id) {
-      // Editar pregunta existente
-      this.http.put(`http://localhost:5000/updatePregunta/${this.pregunta.id}`, this.pregunta).subscribe(response => {
-        console.log('Pregunta actualizada:', response);
-        this.loadPreguntas(); // Recargar la lista de preguntas después de actualizar una pregunta
-        this.resetForm();
-      }, error => {
-        console.error('Error al actualizar pregunta:', error);
+  loadPreguntas() {
+    if (this.selectedModulo) {
+      this.authService.getPreguntasModulo(this.selectedModulo).subscribe({
+        next: (res: any) => {
+          this.preguntas = res;
+        },
+        error: (error) => {
+          console.error("Error al obtener preguntas:", error);
+        }
       });
-    } else {
-      // Agregar nueva pregunta
-      this.http.post('http://localhost:5000/addPregunta', this.pregunta).subscribe(response => {
-        console.log('Pregunta agregada:', response);
-        this.loadPreguntas(); // Recargar la lista de preguntas después de agregar una nueva
-        this.resetForm();
-      }, error => {
-        console.error('Error al agregar pregunta:', error);
-      });
+    }
+  }
+
+  getRespuestaCorrecta(pregunta: any) {
+    switch (pregunta.respuestaCorrecta) {
+      case 1: return 'A';
+      case 2: return 'B';
+      case 3: return 'C';
+      case 4: return 'D';
+      default: return '';
     }
   }
 
@@ -77,32 +100,29 @@ export class QuestionBankPage implements OnInit {
     this.pregunta = { ...pregunta };
   }
 
-  deletePregunta(id: number) {
-    this.http.delete(`http://localhost:5000/deletePregunta/${id}`).subscribe(response => {
-      console.log('Pregunta eliminada:', response);
-      this.loadPreguntas(); // Recargar la lista de preguntas después de eliminar una pregunta
-    }, error => {
-      console.error('Error al eliminar pregunta:', error);
+  deletePregunta(idPregunta: number) {
+    this.authService.deletePregunta(idPregunta).subscribe({
+      next: (res: any) => {
+        alert(res.message);
+        this.loadPreguntas();
+      },
+      error: (error) => {
+        console.error("Error al eliminar pregunta:", error);
+        alert("Error al eliminar pregunta, intenta de nuevo.");
+      }
     });
   }
 
-  resetForm() {
+  resetPregunta() {
     this.pregunta = {
-      id: null,
+      idPregunta: null,
       pregunta: '',
       respuesta1: '',
       respuesta2: '',
       respuesta3: '',
       respuesta4: '',
-      respuesta_correcta: '',
-      id_modulo: ''
+      respuestaCorrecta: '',
+      idModulo: ''
     };
-  }
-
-  getRespuestaCorrecta(pregunta: any) {
-    const respuestas = ['respuesta1', 'respuesta2', 'respuesta3', 'respuesta4'];
-    const incisos = ['A', 'B', 'C', 'D'];
-    const index = parseInt(pregunta.respuesta_correcta) - 1;
-    return `${incisos[index]}. ${pregunta[respuestas[index]]}`;
   }
 }

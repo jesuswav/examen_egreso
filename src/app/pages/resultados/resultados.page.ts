@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonLabel } from '@ionic/angular/standalone';
+import { IonContent, IonGrid, IonCardHeader, IonList, IonItem, IonLabel,IonCardTitle, IonCardContent, IonCard, IonCol, IonRow } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './resultados.page.html',
   styleUrls: ['./resultados.page.scss'],
   standalone: true,
-  imports: [IonLabel, IonItem, IonList, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonLabel,IonGrid, IonCardHeader, IonCardTitle, IonCardContent, IonCard, IonCol, IonRow,IonItem, IonList, IonContent, CommonModule, FormsModule]
 })
 export class ResultadosPage implements OnInit {
   resultados: any[] = [];
@@ -17,9 +17,17 @@ export class ResultadosPage implements OnInit {
   constructor(private authService: AuthService) { }
 
   ngOnInit() {
-    this.authService.getResultados().subscribe(data => {
-      this.resultados = data;
-    });
+    this.loadResultados();
   }
 
+  loadResultados() {
+    this.authService.getResultados().subscribe({
+      next: (res: any) => {
+        this.resultados = res;
+      },
+      error: (error) => {
+        console.error("Error al obtener resultados:", error);
+      }
+    });
+  }
 }

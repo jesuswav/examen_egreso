@@ -39,8 +39,13 @@ export const routes: Routes = [
       path: '',
       redirectTo: 'add-users',
       pathMatch: 'full'
-    }
+    },
+    {
+      path: 'modulos',
+      loadComponent: () => import('./pages/modulos/modulos.page').then( m => m.ModulosPage)
+    },
     ]
   },
+  
   
 ];
