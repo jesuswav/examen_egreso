@@ -3,27 +3,32 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-examen',
   templateUrl: './examen.page.html',
   styleUrls: ['./examen.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule]
+  imports: [CommonModule, IonicModule, RouterModule], 
+  providers: [HttpClient]
 })
 export class ExamenPage implements OnInit {
   preguntas: any[] = [];
   answeredQuestions = 0;
   totalQuestions = 5;
   answeredSet = new Set<number>();
-  timeLeft = 600; // 10 minutes in seconds
+  timeLeft = 6000; // 10 minutes in seconds
   timerInterval: any;
+
+  examen: any[] = [];
 
   constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit() {
     this.preguntas = history.state.preguntas;
     this.startTimer();
+    this.getExamen();
   }
 
   updateProgress = (questionId: number) => {
@@ -63,5 +68,17 @@ export class ExamenPage implements OnInit {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  getExamen() {
+    this.authService.getExamen(1).subscribe({
+      next: (res: any) => {
+        console.log('Examen: ', res);
+        this.examen = res;
+      },
+      error: (error) => {
+        console.error('Error al obtener los modulos:', error);
+      },
+    });
   }
 }

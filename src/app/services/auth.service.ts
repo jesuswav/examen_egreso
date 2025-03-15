@@ -74,6 +74,10 @@ export class AuthService {
     return this.http.put('http://localhost:3200/editModulo', data);
   }
 
+  public getExamen(idExamen: number): Observable<any> {
+    return this.http.get(`http://localhost:3200/getExamen/${idExamen}`);
+  }
+
   public logout() {
     // Aquí puedes limpiar cualquier dato de sesión si es necesario
     console.log('Usuario deslogueado');

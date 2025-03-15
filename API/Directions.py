@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 #from flask_mysqldb import MySQL, MySQLdb
 import pymysql
+from collections import defaultdict
 
 app = Flask(__name__)
 CORS(app)
@@ -120,8 +121,8 @@ def addPregunta():
         respuesta2 = data.get('respuesta2')
         respuesta3 = data.get('respuesta3')
         respuesta4 = data.get('respuesta4')
-        respuesta_correcta = data.get('respuesta_correcta')
-        id_modulo = data.get('id_modulo')
+        respuesta_correcta = data.get('respuestaCorrecta')
+        id_modulo = data.get('idModulo')
         # ejecutar consulta
         execute_query("INSERT INTO preguntas (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuestaCorrecta, idModulo) VALUES (%s, %s, %s, %s, %s, %s, %s)", (pregunta, respuesta1, respuesta2, respuesta3, respuesta4, respuesta_correcta, id_modulo))
 
@@ -357,5 +358,58 @@ def editModulo():
         print("Error en editModulo: ", e)
         return jsonify({"error": "Error en editModulo"})
 
+## endpoint para crear un examen
+@app.route('/getExamen/<int:idExamen>', methods=['GET'])
+@cross_origin(allow_headers=['Content-Type'])
+def getExamen(idExamen):
+    try:
+        examen = execute_query("""
+            SELECT modulos.* FROM modulos 
+            JOIN examenModulo ON modulos.idModulo = examenModulo.moduloId
+            WHERE examenModulo.examenId = %s;""", (idExamen))
+        
+        print(examen)
+
+        ## Diccionario para las preguntas por modulo
+        preguntas_por_modulo = defaultdict(list)
+        # Lista final de módulos con sus preguntas
+        modulos_con_preguntas = []
+
+        for modulo in examen:
+            print(f"ID: {modulo['idModulo']}, Nombre: {modulo['modulo']}")
+
+            preguntasModulo = execute_query("""
+                SELECT *
+                FROM preguntas
+                WHERE idModulo = %s;""", (modulo['idModulo']))
+
+            ## recorrer la lista de preguntas
+            for pregunta in preguntasModulo:
+                id_modulo = pregunta['idModulo']
+                preguntas_por_modulo[id_modulo].append(pregunta)
+            
+            print('preguntas por modulo: ', preguntasModulo)
+        
+        for id_modulo, preguntas_modulo in preguntas_por_modulo.items():
+            modulo = {
+            'idModulo': id_modulo,
+            'preguntas': preguntas_modulo
+            }
+            modulos_con_preguntas.append(modulo)
+
+        return jsonify(modulos_con_preguntas)
+    except Exception as e:
+        print("Error en editModulo: ", e)
+        return jsonify({"error": "Error en editModulo"})
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=3200, debug=True)
+
+""" 
+CREATE TABLE examen (
+    idExamen INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    descripcion TEXT,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+); 
+"""
