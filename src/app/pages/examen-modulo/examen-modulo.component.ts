@@ -2,9 +2,12 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ExamenComunicationService } from 'src/app/services/examen-comunication.service';
+import { QuestionComponent } from 'src/app/components/question/question.component';
 
 @Component({
   selector: 'app-examen-modulo',
+  standalone: true,
+  imports: [QuestionComponent],
   templateUrl: './examen-modulo.component.html',
   styleUrls: ['./examen-modulo.component.scss'],
 })
@@ -22,7 +25,6 @@ export class ExamenModuloComponent implements OnInit {
 
   ngOnInit(): void {
     this.idModulo = +this.route.snapshot.paramMap.get('id')!;
-    this.modulos = this.route.snapshot.queryParamMap.get('nombre')!;
 
     console.log('Modulos', this.modulos);
 
