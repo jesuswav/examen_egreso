@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { HttpClient } from '@angular/common/http';
+import { ExamenModuloComponent } from '../examen-modulo/examen-modulo.component';
+import { ExamenComunicationService } from 'src/app/services/examen-comunication.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-examen',
   templateUrl: './examen.page.html',
   styleUrls: ['./examen.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule], 
-  providers: [HttpClient]
+  imports: [CommonModule, IonicModule, RouterModule],
+  providers: [HttpClient],
 })
 export class ExamenPage implements OnInit {
   preguntas: any[] = [];
@@ -21,14 +24,36 @@ export class ExamenPage implements OnInit {
   timeLeft = 6000; // 10 minutes in seconds
   timerInterval: any;
 
-  examen: any[] = [];
+  // suscribciones un evento interno
+  private siguienteModuloSubscription: Subscription | undefined;
+  private comenzarExamenSubscription: Subscription | undefined;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  examen: any[] = [];
+  modulos: any[] = [];
+  moduloActualIndex: number = 0;
+
+  @ViewChild(ExamenModuloComponent) moduloComponent!: ExamenModuloComponent;
+
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private examenComunicationService: ExamenComunicationService
+  ) {}
 
   ngOnInit() {
     this.preguntas = history.state.preguntas;
-    this.startTimer();
+    //this.startTimer();
     this.getExamen();
+    // ejecutar funciónd esde el componente hijo
+    this.siguienteModuloSubscription =
+      this.examenComunicationService.siguienteModulo$.subscribe(() => {
+        this.siguienteModulo(); // Ejecuta la función del componente padre
+      });
+    //
+    this.comenzarExamenSubscription =
+      this.examenComunicationService.comenzarExamen$.subscribe(() => {
+        this.comenzarExamen(); // Ejecuta la función "comenzarExamen"
+      });
   }
 
   updateProgress = (questionId: number) => {
@@ -36,19 +61,25 @@ export class ExamenPage implements OnInit {
       this.answeredSet.add(questionId);
       this.answeredQuestions++;
       const progressValue = this.answeredQuestions / this.totalQuestions;
-      const progressBar = document.getElementById('progress-bar') as HTMLIonProgressBarElement;
-      const progressText = document.getElementById('progress-text') as HTMLParagraphElement;
+      const progressBar = document.getElementById(
+        'progress-bar'
+      ) as HTMLIonProgressBarElement;
+      const progressText = document.getElementById(
+        'progress-text'
+      ) as HTMLParagraphElement;
       progressBar.value = progressValue;
       progressText.textContent = `Progreso: ${this.answeredQuestions}/${this.totalQuestions}`;
     }
-  }
+  };
 
   startTimer() {
     this.timerInterval = setInterval(() => {
       const minutes = Math.floor(this.timeLeft / 60);
       const seconds = this.timeLeft % 60;
       const timerElement = document.getElementById('timer') as HTMLDivElement;
-      timerElement.textContent = `Tiempo restante: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      timerElement.textContent = `Tiempo restante: ${minutes}:${
+        seconds < 10 ? '0' : ''
+      }${seconds}`;
       if (this.timeLeft > 0) {
         this.timeLeft--;
       } else {
@@ -75,10 +106,33 @@ export class ExamenPage implements OnInit {
       next: (res: any) => {
         console.log('Examen: ', res);
         this.examen = res;
+        this.examen.forEach((item: any ) => this.modulos.push(item.idModulo))
       },
       error: (error) => {
         console.error('Error al obtener los modulos:', error);
       },
     });
+  }
+
+  comenzarExamen(): void {
+    if (this.modulos.length > 0) {
+      this.moduloActualIndex = 0;
+      this.router.navigate(['/examen/modulo', this.modulos[0]]); // Redirige al primer módulo
+    }
+  }
+
+  siguienteModulo(): void {
+    console.log('holaaaa');
+    this.moduloActualIndex++;
+    console.log('actual: ', this.moduloActualIndex)
+    console.log('totales: ', this.modulos.length)
+    if (this.moduloActualIndex < this.modulos.length) {
+      console.log('-------')
+      const siguienteModulo = this.modulos[this.moduloActualIndex];
+      this.router.navigate(['/examen/modulo', siguienteModulo]); // Navega al siguiente módulo
+    } else {
+      console.log('asdasdasd')
+      this.router.navigate(['/examen/final']); // Navega al fin del examen
+    }
   }
 }

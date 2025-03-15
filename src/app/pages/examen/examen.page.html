@@ -6,7 +6,7 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
+<!-- 
 <ion-content>
   <div id="timer" class="timer"></div>
   <ion-list>
@@ -37,9 +37,9 @@
   <ion-progress-bar id="progress-bar" value="0"></ion-progress-bar>
   <div id="progress-text" class="progress-text">Progreso: 0/5</div>
   <ion-button expand="full" (click)="submit()">Enviar</ion-button>
-</ion-content>
+</ion-content> -->
 
-<ion-tabs>
+<!-- <ion-tabs>
   <ion-tab-bar slot="bottom">
     <ion-tab-button tab="modulo1">
       <ion-label>Módulo 1</ion-label>
@@ -56,5 +56,11 @@
     <ion-tab-button tab="modulo5">
       <ion-label>Módulo 5</ion-label>
     </ion-tab-button>
-  </ion-tab-bar>
-</ion-tabs>
+  </ion-tab-bar> -->
+
+<!-- cargar rutas de los componentes hijos para manejar el estado del examen -->
+<div>
+  <h1>Examen</h1>
+  <router-outlet></router-outlet>
+  <!-- Aquí se cargan las rutas hijas -->
+</div>

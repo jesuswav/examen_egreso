@@ -397,7 +397,7 @@ def getExamen(idExamen):
             }
             modulos_con_preguntas.append(modulo)
 
-        return jsonify(modulos_con_preguntas)
+        return jsonify(examen)
     except Exception as e:
         print("Error en editModulo: ", e)
         return jsonify({"error": "Error en editModulo"})

@@ -1,0 +1,8 @@
+<div>
+  <h2>Módulo {{ idModulo }}</h2>
+  <div *ngFor="let pregunta of preguntas">
+    <p>{{ pregunta.pregunta }}</p>
+    <!-- Aquí muestras las opciones de respuesta -->
+  </div>
+  <button (click)="siguienteModulo()">Siguiente Módulo</button>
+</div>
