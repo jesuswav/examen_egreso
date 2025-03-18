@@ -3,16 +3,16 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ExamenComunicationService } from 'src/app/services/examen-comunication.service';
 import { QuestionComponent } from 'src/app/components/question/question.component';
+import { IonButton } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-examen-modulo',
   standalone: true,
-  imports: [QuestionComponent],
+  imports: [QuestionComponent, IonButton],
   templateUrl: './examen-modulo.component.html',
   styleUrls: ['./examen-modulo.component.scss'],
 })
 export class ExamenModuloComponent implements OnInit {
-
   idModulo: number = 0;
   preguntas: any[] = [];
   modulos: string = '';

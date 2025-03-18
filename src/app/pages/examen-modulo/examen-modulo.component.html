@@ -1,14 +1,12 @@
 <div>
   <h2>Módulo {{ idModulo }}</h2>
   <div>
-    <ul>
-      @for (pregunta of preguntas; track pregunta.idPregunta) {
-      <app-question [pregunta]="pregunta" />
-      }
-    </ul>
+    <app-question [preguntas]="preguntas" />
     <!-- <p>{{ pregunta.pregunta }}</p> -->
     <!-- Aquí muestras las opciones de respuesta -->
     <!-- <app-question [pregunta]="pregunta" /> -->
   </div>
-  <button (click)="siguienteModulo()">Siguiente Módulo</button>
+  <div class="footer-button">
+    <ion-button (click)="siguienteModulo()">Siguiente Módulo</ion-button>
+  </div>
 </div>

@@ -1,15 +1,33 @@
-<ion-list>
+<ion-list class="question-container">
+  @for (pregunta of preguntas; track pregunta.idPregunta) {
   <ion-item>
     <ion-label>
       <h2>{{ pregunta.pregunta }}</h2>
       <p>Respuestas:</p>
-      <ul>
-        <li>Hola</li>
-        <li>A. {{ pregunta.respuesta1 }}</li>
-        <li>B. {{ pregunta.respuesta2 }}</li>
-        <li>C. {{ pregunta.respuesta3 }}</li>
-        <li>D. {{ pregunta.respuesta4 }}</li>
-      </ul>
+      <ion-radio-group [(ngModel)]="respuestas[pregunta.idPregunta]">
+        <ion-item>
+          <ion-label>A. {{ pregunta.respuesta1 }}</ion-label>
+          <ion-radio slot="start" value="A"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>B. {{ pregunta.respuesta2 }}</ion-label>
+          <ion-radio slot="start" value="B"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>C. {{ pregunta.respuesta3 }}</ion-label>
+          <ion-radio slot="start" value="C"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>D. {{ pregunta.respuesta4 }}</ion-label>
+          <ion-radio slot="start" value="D"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
     </ion-label>
   </ion-item>
+  }
 </ion-list>
+
+<!-- Botón para guardar las respuestas -->
+<ion-button expand="full" (click)="guardarRespuestas()"
+  >Guardar Respuestas</ion-button
+>
