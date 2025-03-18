@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { ExamenComunicationService } from 'src/app/services/examen-comunication.service';
 import { QuestionComponent } from 'src/app/components/question/question.component';
 import { IonButton } from '@ionic/angular/standalone';
+import { GlobalStateService } from 'src/app/services/global-state.service';
 
 @Component({
   selector: 'app-examen-modulo',
@@ -20,7 +21,8 @@ export class ExamenModuloComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private authService: AuthService,
-    private examenComunicationService: ExamenComunicationService
+    private examenComunicationService: ExamenComunicationService,
+    private globalStateService: GlobalStateService
   ) {}
 
   ngOnInit(): void {
@@ -29,7 +31,10 @@ export class ExamenModuloComponent implements OnInit {
     console.log('Modulos', this.modulos);
 
     console.log('modulo en el que nos encontramos', this.idModulo);
+
     this.obtenerPreguntas();
+    // asignar modulo al estado global de la aplicación
+    this.globalStateService.setModulo(this.idModulo)
   }
 
   obtenerPreguntas(): void {

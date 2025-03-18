@@ -78,6 +78,10 @@ export class AuthService {
     return this.http.get(`http://localhost:3200/getExamen/${idExamen}`);
   }
 
+  public saveAnswers(answers: any): Observable<any> {
+    return this.http.post('http://localhost:3200/saveAnswers', answers);
+  }
+
   public logout() {
     // Aquí puedes limpiar cualquier dato de sesión si es necesario
     console.log('Usuario deslogueado');

@@ -401,6 +401,32 @@ def getExamen(idExamen):
     except Exception as e:
         print("Error en editModulo: ", e)
         return jsonify({"error": "Error en editModulo"})
+    
+@app.route('/saveAnswers', methods=['POST'])
+@cross_origin(allow_headers=['Content-Type'])
+def saveAnswers():
+    try:
+        data = request.json
+
+        for respuesta in data:
+            print(f"Pregunta: {respuesta['idPregunta']}")
+            if respuesta['respuesta'] == "A" or respuesta['respuesta'] == "B" or respuesta['respuesta'] == 'C' or respuesta['respuesta'] == 'D':
+                print('Holaaaa')
+                execute_query("""
+                INSERT INTO respuestasEstudiantes (idUsuario, idPregunta, idModulo, respuestaCerrada)
+                    VALUES (%s, %s, %s, %s);
+                """, (respuesta['idUsuario'], respuesta['idPregunta'], respuesta['idModulo'], respuesta['respuesta']))
+            else:
+                execute_query("""
+                INSERT INTO respuestasEstudiantes (idUsuario, idPregunta, idModulo, respuestaAbierta)
+                    VALUES (%s, %s, %s, %s);
+                """, (respuesta['idUsuario'], respuesta['idPregunta'], respuesta['idModulo'], respuesta['respuesta']))
+
+        return jsonify({"message": "Respuestas guardadas exitosamente"})
+    except Exception as e:
+        print("Error en editModulo: ", e)
+        return jsonify({"error": "Error en saveAnswers"})
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=3200, debug=True)
@@ -412,4 +438,5 @@ CREATE TABLE examen (
     descripcion TEXT,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
+
 """

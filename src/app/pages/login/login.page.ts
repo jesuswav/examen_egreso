@@ -8,6 +8,7 @@ import {
   IonLabel, IonInput, IonButton, ModalController 
 } from '@ionic/angular/standalone';
 import { AuthService } from 'src/app/services/auth.service';
+import { GlobalStateService } from 'src/app/services/global-state.service';
 
 @Component({
   selector: 'app-login',
@@ -43,7 +44,8 @@ export class LoginPage {
   constructor(
     private router: Router, 
     private modalController: ModalController,
-    private authService: AuthService
+    private authService: AuthService,
+    private globalStateService: GlobalStateService
   ) {}
 
   async login() {
@@ -76,7 +78,8 @@ export class LoginPage {
       console.log(data)
       this.authService.auth(data).subscribe({
         next: (res: any) => {
-          console.log("Respuesta de API:", res);
+          console.log("Respuesta de API:", res.idUsuario);
+          this.globalStateService.setUsuario(res.idUsuario)
           
           if (res && res.usuario) {
             this.dataApi = res;  // Tomamos el usuario de la respuesta
