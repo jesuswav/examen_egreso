@@ -9,21 +9,50 @@ import { GlobalStateService } from 'src/app/services/global-state.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCoffee, faCircleDot } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
+// importaciones para el modal
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { ModalContentComponent } from 'src/app/components/modal-content/modal-content.component';
 
 @Component({
   selector: 'app-inicio-examen',
   standalone: true,
-  imports: [CommonModule, QuestionComponent, IonButton, FontAwesomeModule],
+  imports: [
+    CommonModule,
+    QuestionComponent,
+    IonButton,
+    FontAwesomeModule,
+    MatButtonModule,
+  ],
   templateUrl: './inicio-examen.component.html',
   styleUrls: ['./inicio-examen.component.scss'],
 })
 export class InicioExamenComponent {
+  title = 'angular-modal-standalone-example';
+
   constructor(
     private router: Router,
     private examenComunicationService: ExamenComunicationService,
     private globalStateService: GlobalStateService,
-    private authService: AuthService
+    private authService: AuthService,
+    public dialog: MatDialog
   ) {}
+
+  // funciones para abrir el modal
+  openModal(): void {
+    const dialogRef = this.dialog.open(ModalContentComponent, {
+      width: '400px', // Ancho del modal
+      data: {
+        /* Puedes pasar datos al modal si es necesario */
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('El modal se cerró');
+      // Puedes manejar el resultado aquí
+      this.comenzarExamen()
+    });
+  }
 
   // definición de los iconos
   faCoffee = faCoffee;
