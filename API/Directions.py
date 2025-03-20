@@ -364,43 +364,53 @@ def editModulo():
 def getExamen(idExamen):
     try:
         examen = execute_query("""
-            SELECT modulos.* FROM modulos 
+            SELECT 
+                modulos.*,
+                examen.*
+            FROM modulos 
             JOIN examenModulo ON modulos.idModulo = examenModulo.moduloId
+            JOIN examen ON examenModulo.examenId = examen.idExamen
             WHERE examenModulo.examenId = %s;""", (idExamen))
         
         print(examen)
-
-        ## Diccionario para las preguntas por modulo
-        preguntas_por_modulo = defaultdict(list)
-        # Lista final de módulos con sus preguntas
-        modulos_con_preguntas = []
-
-        for modulo in examen:
-            print(f"ID: {modulo['idModulo']}, Nombre: {modulo['modulo']}")
-
-            preguntasModulo = execute_query("""
-                SELECT *
-                FROM preguntas
-                WHERE idModulo = %s;""", (modulo['idModulo']))
-
-            ## recorrer la lista de preguntas
-            for pregunta in preguntasModulo:
-                id_modulo = pregunta['idModulo']
-                preguntas_por_modulo[id_modulo].append(pregunta)
-            
-            print('preguntas por modulo: ', preguntasModulo)
-        
-        for id_modulo, preguntas_modulo in preguntas_por_modulo.items():
-            modulo = {
-            'idModulo': id_modulo,
-            'preguntas': preguntas_modulo
-            }
-            modulos_con_preguntas.append(modulo)
-
         return jsonify(examen)
     except Exception as e:
         print("Error en editModulo: ", e)
-        return jsonify({"error": "Error en editModulo"})
+        return jsonify({"error": "Error en getExamen"})
+    
+## endpoint para crear un examen
+@app.route('/getInfoExamen/<int:idExamen>', methods=['GET'])
+@cross_origin(allow_headers=['Content-Type'])
+def getInfoExamen(idExamen):
+    try:
+        query = execute_query("""
+            SELECT 
+                modulos.*,
+                examen.*
+            FROM modulos 
+            JOIN examenModulo ON modulos.idModulo = examenModulo.moduloId
+            JOIN examen ON examenModulo.examenId = examen.idExamen
+            WHERE examenModulo.examenId = %s;""", (idExamen))
+        
+        # diccionario para la respuesta
+        infoExamen = {
+            "idExamen": 0,
+            "nombre": '',
+            "descripcion": '', 
+            "modulos": [],
+        }
+        
+        for item in query:
+            infoExamen['idExamen'] = item['idExamen']
+            infoExamen['nombre'] = item['nombre']
+            infoExamen['descripcion'] = item['descripcion']
+            infoExamen['modulos'].append({ 'idModulo': item['idModulo'], 'nombreModulo': item['modulo'] })
+        print('------------------')
+        print(infoExamen)
+        return jsonify(infoExamen)
+    except Exception as e:
+        print("Error en getInfoExamen: ", e)
+        return jsonify({"error": "Error en getInfoExamen"})
     
 @app.route('/saveAnswers', methods=['POST'])
 @cross_origin(allow_headers=['Content-Type'])

@@ -1,4 +1,19 @@
 <div>
-  <h2>Bienvenido al Examen</h2>
+  <h2>Bienvenido al {{ infoExamen.nombre }}</h2>
+  <div>
+    <!-- Descripción -->
+    <span>
+      <p>{{ infoExamen.descripcion }}</p>
+    </span>
+    <h3>Módulos que contiene el examen:</h3>
+    <ul>
+      @for ( modulo of infoExamen.modulos; track modulo.idModulo) {
+      <div class="module-list-item">
+        <fa-icon [icon]="faCircleDot"></fa-icon>
+        <li>{{ modulo.nombreModulo }}</li>
+      </div>
+      }
+    </ul>
+  </div>
   <ion-button (click)="comenzarExamen()">Comenzar Examen</ion-button>
 </div>

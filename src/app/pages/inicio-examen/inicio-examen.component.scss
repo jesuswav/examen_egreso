@@ -1,0 +1,10 @@
+.module-list-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: start;
+  list-style: none;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+}

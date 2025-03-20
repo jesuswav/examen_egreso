@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { _URL_AUTH, _URL_GET_USERS, _URL_GET_RESULTADOS, _URL_GET_PREGUNTAS_MODULO } from '../config/config';
+import {
+  _URL_AUTH,
+  _URL_GET_USERS,
+  _URL_GET_RESULTADOS,
+  _URL_GET_PREGUNTAS_MODULO,
+} from '../config/config';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   public auth(data: any): Observable<any> {
     return this.http.post(_URL_AUTH, data);
@@ -47,7 +51,9 @@ export class AuthService {
   }
 
   public getPreguntas(selectedModulo: any): Observable<any> {
-    return this.http.get(`http://localhost:3200/getPreguntas?id_modulo=${selectedModulo}`)
+    return this.http.get(
+      `http://localhost:3200/getPreguntas?id_modulo=${selectedModulo}`
+    );
   }
 
   public addPregunta(data: any): Observable<any> {
@@ -63,7 +69,9 @@ export class AuthService {
   }
 
   public deletePregunta(idPregunta: number): Observable<any> {
-    return this.http.delete(`http://localhost:3200/deletePregunta/${idPregunta}`);
+    return this.http.delete(
+      `http://localhost:3200/deletePregunta/${idPregunta}`
+    );
   }
 
   public deleteModulo(idModulo: number): Observable<any> {
@@ -76,6 +84,10 @@ export class AuthService {
 
   public getExamen(idExamen: number): Observable<any> {
     return this.http.get(`http://localhost:3200/getExamen/${idExamen}`);
+  }
+
+  public getInfoExamen(idExamen: number): Observable<any> {
+    return this.http.get(`http://localhost:3200/getInfoExamen/${idExamen}`);
   }
 
   public saveAnswers(answers: any): Observable<any> {

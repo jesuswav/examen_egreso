@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { ExamenModuloComponent } from '../examen-modulo/examen-modulo.component';
 import { ExamenComunicationService } from 'src/app/services/examen-comunication.service';
 import { Subscription } from 'rxjs';
+import { GlobalStateService } from 'src/app/services/global-state.service';
 
 @Component({
   selector: 'app-examen',
@@ -37,7 +38,8 @@ export class ExamenPage implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private examenComunicationService: ExamenComunicationService
+    private examenComunicationService: ExamenComunicationService,
+    private globalStateService: GlobalStateService
   ) {}
 
   ngOnInit() {
@@ -106,7 +108,8 @@ export class ExamenPage implements OnInit {
       next: (res: any) => {
         console.log('Examen: ', res);
         this.examen = res;
-        this.examen.forEach((item: any ) => this.modulos.push(item.idModulo))
+        this.globalStateService.setExamen(res);
+        this.examen.forEach((item: any) => this.modulos.push(item.idModulo));
       },
       error: (error) => {
         console.error('Error al obtener los modulos:', error);
@@ -124,14 +127,14 @@ export class ExamenPage implements OnInit {
   siguienteModulo(): void {
     console.log('holaaaa');
     this.moduloActualIndex++;
-    console.log('actual: ', this.moduloActualIndex)
-    console.log('totales: ', this.modulos.length)
+    console.log('actual: ', this.moduloActualIndex);
+    console.log('totales: ', this.modulos.length);
     if (this.moduloActualIndex < this.modulos.length) {
-      console.log('-------')
+      console.log('-------');
       const siguienteModulo = this.modulos[this.moduloActualIndex];
       this.router.navigate(['/examen/modulo', siguienteModulo]); // Navega al siguiente módulo
     } else {
-      console.log('asdasdasd')
+      console.log('asdasdasd');
       this.router.navigate(['/examen/final']); // Navega al fin del examen
     }
   }
