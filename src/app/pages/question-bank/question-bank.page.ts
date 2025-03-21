@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonList, IonGrid, IonRow, IonCol, IonBadge } from '@ionic/angular/standalone';
 import { AuthService } from 'src/app/services/auth.service';
+import * as Papa from 'papaparse';
 
 @Component({
   selector: 'app-question-bank',
@@ -45,6 +46,19 @@ export class QuestionBankPage implements OnInit {
     });
   }
 
+  loadPreguntas() {
+    if (this.selectedModulo) {
+      this.authService.getPreguntas(this.selectedModulo).subscribe({
+        next: (res: any) => {
+          this.preguntas = res;
+        },
+        error: (error) => {
+          console.error("Error al obtener preguntas:", error);
+        }
+      });
+    }
+  }
+
   addPregunta() {
     if (this.pregunta.idPregunta) {
       this.authService.editPregunta(this.pregunta).subscribe({
@@ -68,19 +82,6 @@ export class QuestionBankPage implements OnInit {
         error: (error) => {
           console.error("Error al agregar pregunta:", error);
           alert("Error al agregar pregunta, intenta de nuevo.");
-        }
-      });
-    }
-  }
-
-  loadPreguntas() {
-    if (this.selectedModulo) {
-      this.authService.getPreguntasModulo(this.selectedModulo).subscribe({
-        next: (res: any) => {
-          this.preguntas = res;
-        },
-        error: (error) => {
-          console.error("Error al obtener preguntas:", error);
         }
       });
     }
@@ -124,5 +125,31 @@ export class QuestionBankPage implements OnInit {
       respuestaCorrecta: '',
       idModulo: ''
     };
+  }
+
+  handleFileInput(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        complete: (results) => {
+          console.log(results.data); // Debugging line to check the parsed data
+          this.authService.addPreguntasFromCSV(results.data).subscribe({
+            next: (res: any) => {
+              alert(res.message);
+              this.loadPreguntas();
+            },
+            error: (error) => {
+              console.error("Error al agregar preguntas desde CSV:", error);
+              alert("Error al agregar preguntas desde CSV, intenta de nuevo.");
+            }
+          });
+        },
+        error: (error) => {
+          console.error("Error al leer el archivo CSV:", error);
+          alert("Error al leer el archivo CSV, intenta de nuevo.");
+        }
+      });
+    }
   }
 }

@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 from flask_mysqldb import MySQL, MySQLdb
+import csv
+import io
 
 app = Flask(__name__)
 CORS(app)
@@ -132,28 +134,6 @@ def getPreguntas():
         print("Error en getPreguntas: ", e)
         return jsonify({"error": "Error en getPreguntas"})
 
-@app.route('/getPreguntasModulo1', methods=['GET'])
-@cross_origin(allow_headers=['Content-Type'])
-def getPreguntasModulo1():
-    try:
-        usuario_id = request.args.get('usuario_id')
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("""
-            SELECT preguntas.id, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuesta_correcta
-            FROM preguntas
-            JOIN modulos ON preguntas.id_modulo = modulos.id
-            JOIN examenes_modulos ON modulos.id = examenes_modulos.modulo_id
-            JOIN carreras ON examenes_modulos.examen_id = carreras.examen_id
-            JOIN usuarios ON carreras.carrera_id = usuarios.carrera_id
-            WHERE usuarios.id = %s AND modulos.nombre = 'Modulo 1'
-        """, (usuario_id,))
-        result = cur.fetchall()
-        cur.close()
-        return jsonify(result)
-    except Exception as e:
-        print("Error en getPreguntasModulo1: ", e)
-        return jsonify({"error": "Error en getPreguntasModulo1"})
-
 @app.route('/addModulo', methods=['POST'])
 @cross_origin(allow_headers=['Content-Type'])
 def addModulo():
@@ -188,7 +168,7 @@ def getResultados():
     try:
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cur.execute("""
-            SELECT usuarios.nombre, carreras.carrera, resultados.modulo1Res, resultados.modulo2Res, resultados.modulo3Res, resultados.modulo4Res, resultados.modulo5Res, resultados.resultadoFinal
+            SELECT usuarios.nombre, carreras.carrera, resultados.modulo1Res, resultados.modulo2Res, resultados.modulo3Res, resultados.modulo4Res, resultados.modulo5Res, resultados.resultadoFinal, resultados.idExamen, resultados.nivel
             FROM resultados
             JOIN usuarios ON resultados.idUsuario = usuarios.idUsuario
             JOIN carreras ON usuarios.idCarrera = carreras.idCarrera
@@ -299,6 +279,58 @@ def editModulo():
     except Exception as e:
         print("Error en editModulo: ", e)
         return jsonify({"error": "Error en editModulo"})
+
+@app.route('/assignExamen', methods=['POST'])
+@cross_origin(allow_headers=['Content-Type'])
+def assignExamen():
+    try:
+        data = request.json
+        idCarrera = data.get('idCarrera')
+        idModulo1 = data.get('idModulo1')
+        idModulo2 = data.get('idModulo2')
+        idModulo3 = data.get('idModulo3')
+        idModulo4 = data.get('idModulo4')
+        idModulo5 = data.get('idModulo5')
+        
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            INSERT INTO examen (idCarrera, idModulo1, idModulo2, idModulo3, idModulo4, idModulo5)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (idCarrera, idModulo1, idModulo2, idModulo3, idModulo4, idModulo5))
+        mysql.connection.commit()
+        cur.close()
+        
+        return jsonify({"message": "Examen asignado correctamente"})
+    except Exception as e:
+        print("Error en assignExamen: ", e)
+        return jsonify({"error": "Error en assignExamen"})
+
+@app.route('/getExamenDetails/<int:idExamen>', methods=['GET'])
+@cross_origin(allow_headers=['Content-Type'])
+def getExamenDetails(idExamen):
+    try:
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("""
+            SELECT e.idExamen, c.carrera, m1.modulo as modulo1Nombre, m2.modulo as modulo2Nombre, 
+                   m3.modulo as modulo3Nombre, m4.modulo as modulo4Nombre, m5.modulo as modulo5Nombre
+            FROM examen e
+            JOIN carreras c ON e.idCarrera = c.idCarrera
+            JOIN modulos m1 ON e.idModulo1 = m1.idModulo
+            JOIN modulos m2 ON e.idModulo2 = m2.idModulo
+            JOIN modulos m3 ON e.idModulo3 = m3.idModulo
+            JOIN modulos m4 ON e.idModulo4 = m4.idModulo
+            JOIN modulos m5 ON e.idModulo5 = m5.idModulo
+            WHERE e.idExamen = %s
+        """, (idExamen,))
+        result = cur.fetchone()
+        cur.close()
+        return jsonify(result)
+    except Exception as e:
+        print("Error en getExamenDetails: ", e)
+        return jsonify({"error": "Error en getExamenDetails"})
+
+
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)

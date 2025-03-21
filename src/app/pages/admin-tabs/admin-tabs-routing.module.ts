@@ -24,6 +24,10 @@ const routes: Routes = [
         loadChildren: () => import('../resultados/resultados.page').then(m => m.ResultadosPage)
       },
       {
+        path: 'asignacion',
+        loadChildren: () => import('../asignacion/asignacion.page').then(m => m.AsignacionPage)
+      },
+      {
         path: '',
         redirectTo: '/admin-tabs/add-users',
         pathMatch: 'full'

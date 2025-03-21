@@ -1,15 +1,36 @@
-
 <ion-content>
   <ion-grid>
     <ion-row>
-      <ion-col size="12">
+      <ion-col size="5">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Resultados por Módulo</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <canvas #modulosChart></canvas>
+          </ion-card-content>
+        </ion-card>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Resultados Finales</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <canvas #finalChart></canvas>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="7">
         <ion-card>
           <ion-card-header>
             <ion-card-title>Resultados de Alumnos</ion-card-title>
           </ion-card-header>
           <ion-card-content>
+            <ion-item>
+              <ion-label position="floating">Buscar por Nombre</ion-label>
+              <ion-input [(ngModel)]="searchTerm" (ionInput)="filterResultados()"></ion-input>
+            </ion-item>
             <ion-list>
-              <ion-item *ngFor="let resultado of resultados">
+              <ion-item *ngFor="let resultado of filteredResultados">
                 <ion-label>
                   <h2>{{ resultado.nombre }}</h2>
                   <p>Carrera: {{ resultado.carrera }}</p>
@@ -20,6 +41,7 @@
                   <p>Módulo 5: {{ resultado.modulo5Res }}</p>
                   <p>Resultado Final: {{ resultado.resultadoFinal }}</p>
                 </ion-label>
+                <ion-button (click)="exportToPDF(resultado)">Exportar a PDF</ion-button>
               </ion-item>
             </ion-list>
           </ion-card-content>

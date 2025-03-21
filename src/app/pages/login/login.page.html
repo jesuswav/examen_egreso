@@ -12,12 +12,10 @@
       </ion-card-header>
       <ion-card-content>
         <ion-item>
-          <ion-label position="floating">Username</ion-label>
-          <ion-input type="text" [(ngModel)]="data.usuario" labelPlacement="floating"  placeholder="Username"></ion-input>
+          <ion-input placeholder="Usuario" type="text" [(ngModel)]="data.usuario"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Password</ion-label>
-          <ion-input type="password" [(ngModel)]="data.password"></ion-input>
+          <ion-input placeholder="Contraseña" type="password" [(ngModel)]="data.password"></ion-input>
         </ion-item>
         <ion-button expand="full" style="margin-top: 20px; background-color: #4CAF50; color: white;" (click)="login()">Login</ion-button>
       </ion-card-content>
