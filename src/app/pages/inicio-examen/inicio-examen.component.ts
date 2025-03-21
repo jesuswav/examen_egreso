@@ -9,6 +9,11 @@ import { GlobalStateService } from 'src/app/services/global-state.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCoffee, faCircleDot } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
+// ionicons
+//iconos
+import { addIcons } from 'ionicons';
+import { chevronForwardOutline } from 'ionicons/icons';
+import { IonIcon } from '@ionic/angular/standalone';
 // importaciones para el modal
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,6 +28,7 @@ import { ModalContentComponent } from 'src/app/components/modal-content/modal-co
     IonButton,
     FontAwesomeModule,
     MatButtonModule,
+    IonIcon
   ],
   templateUrl: './inicio-examen.component.html',
   styleUrls: ['./inicio-examen.component.scss'],
@@ -36,7 +42,11 @@ export class InicioExamenComponent {
     private globalStateService: GlobalStateService,
     private authService: AuthService,
     public dialog: MatDialog
-  ) {}
+  ) {
+    addIcons({
+      chevronForwardOutline
+    })
+  }
 
   // funciones para abrir el modal
   openModal(): void {
@@ -50,7 +60,7 @@ export class InicioExamenComponent {
     dialogRef.afterClosed().subscribe((result) => {
       console.log('El modal se cerró');
       // Puedes manejar el resultado aquí
-      this.comenzarExamen()
+      //this.comenzarExamen()
     });
   }
 

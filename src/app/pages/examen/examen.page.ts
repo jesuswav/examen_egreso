@@ -8,6 +8,10 @@ import { ExamenModuloComponent } from '../examen-modulo/examen-modulo.component'
 import { ExamenComunicationService } from 'src/app/services/examen-comunication.service';
 import { Subscription } from 'rxjs';
 import { GlobalStateService } from 'src/app/services/global-state.service';
+//iconos
+import { addIcons } from 'ionicons';
+import { logOutOutline } from 'ionicons/icons';
+import { IonIcon } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-examen',
@@ -40,7 +44,11 @@ export class ExamenPage implements OnInit {
     private authService: AuthService,
     private examenComunicationService: ExamenComunicationService,
     private globalStateService: GlobalStateService
-  ) {}
+  ) {
+    addIcons({
+      logOutOutline,
+    });
+  }
 
   ngOnInit() {
     this.preguntas = history.state.preguntas;

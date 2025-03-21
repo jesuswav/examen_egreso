@@ -15,12 +15,21 @@ export class ExamenComunicationService {
   private comenzarExamenSource = new Subject<void>();
   comenzarExamen$ = this.comenzarExamenSource.asObservable();
 
+  // Subject para la función "cerrarModal"
+  private cerrarModalSource = new Subject<void>();
+  cerrarModal$ = this.cerrarModalSource.asObservable();
+
   siguienteModulo(): void {
     this.siguienteModuloSource.next(); // Emite un evento
   }
 
   // Método para emitir el evento "comenzarExamen"
   comenzarExamen(): void {
+    this.comenzarExamenSource.next();
+  }
+
+  // Método para emitir el evento "cerrarModal"
+  cerrarModal(): void {
     this.comenzarExamenSource.next();
   }
 }
