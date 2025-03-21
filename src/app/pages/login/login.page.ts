@@ -4,8 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonCard, 
-  IonCardHeader, IonCardTitle, IonCardContent, IonItem, 
-  IonLabel, IonInput, IonButton, ModalController 
+  IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonInput, IonButton, ModalController 
 } from '@ionic/angular/standalone';
 import { AuthService } from 'src/app/services/auth.service';
 import { GlobalStateService } from 'src/app/services/global-state.service';
@@ -25,7 +24,6 @@ import { GlobalStateService } from 'src/app/services/global-state.service';
     IonCardTitle,
     IonCardContent,
     IonItem,
-    IonLabel,
     IonInput,
     IonButton,
     CommonModule,

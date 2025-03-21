@@ -12,7 +12,10 @@ import {
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private http: HttpClient) {}
+
+  private apiUrl = 'http://localhost:5000/api'; // Cambia esto a la URL de tu API
+
+  constructor(private http: HttpClient) { }
 
   public auth(data: any): Observable<any> {
     return this.http.post(_URL_AUTH, data);
@@ -23,11 +26,11 @@ export class AuthService {
   }
 
   public getResultados(): Observable<any> {
-    return this.http.get('http://localhost:3200/getResultados');
+    return this.http.get(_URL_GET_RESULTADOS);
   }
 
-  public getPreguntasModulo(modulo: number): Observable<any> {
-    return this.http.get(`${_URL_GET_PREGUNTAS_MODULO}?modulo=${modulo}`);
+  public getPreguntas(idModulo: any): Observable<any> {
+    return this.http.get(_URL_GET_PREGUNTAS_MODULO, { params: { idModulo } });
   }
 
   public registerUser(data: any): Observable<any> {
@@ -64,14 +67,12 @@ export class AuthService {
     return this.http.post('http://localhost:3200/addModulo', data);
   }
 
-  public editPregunta(data: any): Observable<any> {
-    return this.http.put('http://localhost:3200/editPregunta', data);
+  public editPregunta(pregunta: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/preguntas/${pregunta.idPregunta}`, pregunta);
   }
 
   public deletePregunta(idPregunta: number): Observable<any> {
-    return this.http.delete(
-      `http://localhost:3200/deletePregunta/${idPregunta}`
-    );
+    return this.http.delete(`${this.apiUrl}/preguntas/${idPregunta}`);
   }
 
   public deleteModulo(idModulo: number): Observable<any> {
@@ -97,5 +98,17 @@ export class AuthService {
   public logout() {
     // Aquí puedes limpiar cualquier dato de sesión si es necesario
     console.log('Usuario deslogueado');
+  }
+
+  assignExamen(examen: any): Observable<any> {
+    return this.http.post('http://localhost:5000/assignExamen', examen);
+  }
+
+  public getExamenDetails(idExamen: number): Observable<any> {
+    return this.http.get(`http://localhost:5000/getExamenDetails/${idExamen}`);
+  }
+
+  public addPreguntasFromCSV(preguntas: any[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/preguntas/csv`, { preguntas });
   }
 }
