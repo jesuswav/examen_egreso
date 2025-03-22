@@ -19,6 +19,10 @@ export class ExamenComunicationService {
   private cerrarModalSource = new Subject<void>();
   cerrarModal$ = this.cerrarModalSource.asObservable();
 
+  // Subject para la función "guardarRespuestas"
+  private guardarRespuestasSource = new Subject<void>();
+  guardarRespuesstas$ = this.guardarRespuestasSource.asObservable();
+
   siguienteModulo(): void {
     this.siguienteModuloSource.next(); // Emite un evento
   }
@@ -31,5 +35,10 @@ export class ExamenComunicationService {
   // Método para emitir el evento "cerrarModal"
   cerrarModal(): void {
     this.comenzarExamenSource.next();
+  }
+
+  // Método para emitir el evento "cerrarModal"
+  guardarRespuestas(): void {
+    this.guardarRespuestasSource.next();
   }
 }

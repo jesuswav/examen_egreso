@@ -29,10 +29,6 @@ export class AuthService {
     return this.http.get(_URL_GET_RESULTADOS);
   }
 
-  public getPreguntas(idModulo: any): Observable<any> {
-    return this.http.get(_URL_GET_PREGUNTAS_MODULO, { params: { idModulo } });
-  }
-
   public registerUser(data: any): Observable<any> {
     return this.http.post('http://localhost:3200/registerUser', data);
   }

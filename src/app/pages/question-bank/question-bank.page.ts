@@ -91,19 +91,6 @@ export class QuestionBankPage implements OnInit {
   }
 
   loadPreguntas() {
-    console.log('Selected modulo', this.selectedModulo)
-    this.authService.getPreguntas(this.selectedModulo).subscribe({
-      next: (res: any) => {
-        console.log('Preguntas: ', res);
-        this.preguntas = res;
-      },
-      error: (error) => {
-        console.error('Error al obtener las preguntas:', error);
-      },
-    });
-  }
-
-  loadPreguntas() {
     if (this.selectedModulo) {
       this.authService.getPreguntas(this.selectedModulo).subscribe({
         next: (res: any) => {
@@ -184,7 +171,7 @@ export class QuestionBankPage implements OnInit {
     if (file) {
       Papa.parse(file, {
         header: true,
-        complete: (results) => {
+        complete: (results: any) => {
           console.log(results.data); // Debugging line to check the parsed data
           this.authService.addPreguntasFromCSV(results.data).subscribe({
             next: (res: any) => {
@@ -197,7 +184,7 @@ export class QuestionBankPage implements OnInit {
             }
           });
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error("Error al leer el archivo CSV:", error);
           alert("Error al leer el archivo CSV, intenta de nuevo.");
         }

@@ -26,6 +26,10 @@ import {
 } from '@ionic/angular/standalone';
 import { GlobalStateService } from 'src/app/services/global-state.service';
 import { AuthService } from 'src/app/services/auth.service';
+// importaciones para el modal
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { SaveAnswersModalComponent } from '../save-answers-modal/save-answers-modal.component';
 
 @Component({
   selector: 'app-question',
@@ -51,11 +55,28 @@ export class QuestionComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private globalStateService: GlobalStateService
+    private globalStateService: GlobalStateService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit() {
     console.log('Pregunta: ', this.preguntas);
+  }
+
+  // función para abrir el modal antes de registrar las respuestas de manera definitiva
+  openModal(): void {
+    const dialogRef = this.dialog.open(SaveAnswersModalComponent, {
+      width: '400px', // Ancho del modal
+      data: {
+        /* Puedes pasar datos al modal si es necesario */
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('El modal se cerró');
+      // Puedes manejar el resultado aquí
+      //this.comenzarExamen()
+    });
   }
 
   guardarRespuestas(): void {
