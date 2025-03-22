@@ -1,12 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { _URL_AUTH, _URL_GET_USERS, _URL_GET_RESULTADOS, _URL_GET_PREGUNTAS_MODULO } from '../config/config';
+import {
+  _URL_AUTH,
+  _URL_GET_USERS,
+  _URL_GET_RESULTADOS,
+  _URL_GET_PREGUNTAS_MODULO,
+} from '../config/config';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
+
+  private apiUrl = 'http://localhost:5000/api'; // Cambia esto a la URL de tu API
 
   constructor(private http: HttpClient) { }
 
@@ -20,10 +27,6 @@ export class AuthService {
 
   public getResultados(): Observable<any> {
     return this.http.get(_URL_GET_RESULTADOS);
-  }
-
-  public getPreguntasModulo(modulo: number): Observable<any> {
-    return this.http.get(`${_URL_GET_PREGUNTAS_MODULO}?modulo=${modulo}`);
   }
 
   public registerUser(data: any): Observable<any> {
@@ -46,24 +49,62 @@ export class AuthService {
     return this.http.get('http://localhost:3200/getModulos');
   }
 
-  public getPreguntas(selectedModulo: string): Observable<any> {
-    return this.http.get(`http://localhost:3200/getPreguntas?id_modulo=${selectedModulo}`)
+  public getPreguntas(selectedModulo: any): Observable<any> {
+    return this.http.get(
+      `http://localhost:3200/getPreguntas?id_modulo=${selectedModulo}`
+    );
   }
 
-  public addPregunta(pregunta: any): Observable<any> {
-    return this.http.post(`http://localhost:3200/addPregunta`, pregunta)
+  public addPregunta(data: any): Observable<any> {
+    return this.http.post('http://localhost:3200/addPregunta', data);
   }
 
-  public updatePregunta(pregunta: any): Observable<any> {
-    return this.http.put(`http://localhost:3200/updatePregunta/${pregunta.id}`, pregunta)
+  public addModulo(data: any): Observable<any> {
+    return this.http.post('http://localhost:3200/addModulo', data);
   }
 
-  public deletePregunta(id: any): Observable<any> {
-    return this.http.delete(`http://localhost:3200/deletePregunta/${id}`)
+  public editPregunta(pregunta: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/preguntas/${pregunta.idPregunta}`, pregunta);
+  }
+
+  public deletePregunta(idPregunta: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/preguntas/${idPregunta}`);
+  }
+
+  public deleteModulo(idModulo: number): Observable<any> {
+    return this.http.delete(`http://localhost:3200/deleteModulo/${idModulo}`);
+  }
+
+  public editModulo(data: any): Observable<any> {
+    return this.http.put('http://localhost:3200/editModulo', data);
+  }
+
+  public getExamen(idExamen: number): Observable<any> {
+    return this.http.get(`http://localhost:3200/getExamen/${idExamen}`);
+  }
+
+  public getInfoExamen(idExamen: number): Observable<any> {
+    return this.http.get(`http://localhost:3200/getInfoExamen/${idExamen}`);
+  }
+
+  public saveAnswers(answers: any): Observable<any> {
+    return this.http.post('http://localhost:3200/saveAnswers', answers);
   }
 
   public logout() {
     // Aquí puedes limpiar cualquier dato de sesión si es necesario
     console.log('Usuario deslogueado');
+  }
+
+  assignExamen(examen: any): Observable<any> {
+    return this.http.post('http://localhost:5000/assignExamen', examen);
+  }
+
+  public getExamenDetails(idExamen: number): Observable<any> {
+    return this.http.get(`http://localhost:5000/getExamenDetails/${idExamen}`);
+  }
+
+  public addPreguntasFromCSV(preguntas: any[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/preguntas/csv`, { preguntas });
   }
 }

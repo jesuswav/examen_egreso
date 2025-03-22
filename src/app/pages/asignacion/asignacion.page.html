@@ -1,0 +1,47 @@
+<ion-content>
+  <ion-item>
+    <ion-label>Carrera</ion-label>
+    <ion-select [(ngModel)]="data.idCarrera">
+      <ion-select-option *ngFor="let carrera of carreras" [value]="carrera.idCarrera">{{ carrera.carrera }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Lista de Módulos</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let modulo of modulos" [class.selected]="selectedModulos.includes(modulo)">
+                <ion-label>
+                  <h2>{{ modulo.modulo }}</h2>
+                </ion-label>
+                <ion-button (click)="assignModulo(modulo)">Asignar</ion-button>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Módulos Seleccionados</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let modulo of selectedModulos">
+                <ion-label>
+                  <h2>{{ modulo.modulo }}</h2>
+                </ion-label>
+                <ion-button color="danger" (click)="removeModulo(modulo)">Eliminar</ion-button>
+              </ion-item>
+            </ion-list>
+            <ion-button expand="full" [disabled]="selectedModulos.length !== 5" (click)="registerExamen()">Registrar</ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -24,6 +24,7 @@ import {
   IonBadge,
 } from '@ionic/angular/standalone';
 import { AuthService } from 'src/app/services/auth.service';
+import * as Papa from 'papaparse';
 
 @Component({
   selector: 'app-question-bank',
@@ -57,14 +58,14 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class QuestionBankPage implements OnInit {
   pregunta = {
-    id: null,
+    idPregunta: null,
     pregunta: '',
     respuesta1: '',
     respuesta2: '',
     respuesta3: '',
     respuesta4: '',
-    respuesta_correcta: '',
-    id_modulo: 0,
+    respuestaCorrecta: '',
+    idModulo: ''
   };
 
   modulos: any[] = [];
@@ -90,46 +91,52 @@ export class QuestionBankPage implements OnInit {
   }
 
   loadPreguntas() {
-    console.log(this.selectedModulo)
-    this.authService.getPreguntas(this.selectedModulo).subscribe({
-      next: (res: any) => {
-        console.log('Preguntas: ', res);
-        this.preguntas = res;
-      },
-      error: (error) => {
-        console.error('Error al obtener las preguntas:', error);
-      },
-    });
-  }
-
-  addPregunta() {
-    console.log('pregunta: ', this.pregunta.id)
-    if (this.pregunta.id) {
-      this.authService.updatePregunta(this.pregunta).subscribe({
+    if (this.selectedModulo) {
+      this.authService.getPreguntas(this.selectedModulo).subscribe({
         next: (res: any) => {
-          console.log('Pregunta actualizada:', res);
-          this.loadPreguntas(); // Recargar la lista de preguntas después de actualizar una pregunta
-          this.resetForm();
+          this.preguntas = res;
         },
         error: (error) => {
-          console.error('Error al actualizar pregunta:', error);
-        },
-      });
-    } else {
-      console.log(this.pregunta)
-      this.authService.addPregunta(this.pregunta).subscribe({
-        next: (res: any) => {
-          console.log('Pregunta agregada:', res);
-          this.loadPreguntas(); // Recargar la lista de preguntas después de agregar una nueva
-          this.resetForm();
-        },
-        error: (error) => {
-          console.error('Error al agregar pregunta:', error);
-        },
+          console.error("Error al obtener preguntas:", error);
+        }
       });
     }
   }
 
+  addPregunta() {
+    if (this.pregunta.idPregunta) {
+      // Editar pregunta existente
+      this.http.put(`http://localhost:3200/updatePregunta/${this.pregunta.idPregunta}`, this.pregunta).subscribe(response => {
+        console.log('Pregunta actualizada:', response);
+        this.loadPreguntas(); // Recargar la lista de preguntas después de actualizar una pregunta
+        this.resetPregunta();
+      }, error => {
+        console.error('Error al actualizar pregunta:', error);
+      });
+    } else {
+      this.authService.addPregunta(this.pregunta).subscribe({
+        next: (res: any) => {
+          alert(res.message);
+          this.loadPreguntas();
+          this.resetPregunta();
+        },
+        error: (error) => {
+          console.error("Error al agregar pregunta:", error);
+          alert("Error al agregar pregunta, intenta de nuevo.");
+        }
+      });
+    }
+  }
+
+  getRespuestaCorrecta(pregunta: any) {
+    switch (pregunta.respuestaCorrecta) {
+      case 1: return 'A';
+      case 2: return 'B';
+      case 3: return 'C';
+      case 4: return 'D';
+      default: return '';
+    }
+  }
   editPregunta(pregunta: any) {
     this.pregunta = { ...pregunta };
   }
@@ -146,23 +153,42 @@ export class QuestionBankPage implements OnInit {
     });
   }
 
-  resetForm() {
+  resetPregunta() {
     this.pregunta = {
-      id: null,
+      idPregunta: null,
       pregunta: '',
       respuesta1: '',
       respuesta2: '',
       respuesta3: '',
       respuesta4: '',
-      respuesta_correcta: '',
-      id_modulo: 0,
+      respuestaCorrecta: '',
+      idModulo: ''
     };
   }
 
-  getRespuestaCorrecta(pregunta: any) {
-    const respuestas = ['respuesta1', 'respuesta2', 'respuesta3', 'respuesta4'];
-    const incisos = ['A', 'B', 'C', 'D'];
-    const index = parseInt(pregunta.respuesta_correcta) - 1;
-    return `${incisos[index]}. ${pregunta[respuestas[index]]}`;
+  handleFileInput(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        complete: (results: any) => {
+          console.log(results.data); // Debugging line to check the parsed data
+          this.authService.addPreguntasFromCSV(results.data).subscribe({
+            next: (res: any) => {
+              alert(res.message);
+              this.loadPreguntas();
+            },
+            error: (error) => {
+              console.error("Error al agregar preguntas desde CSV:", error);
+              alert("Error al agregar preguntas desde CSV, intenta de nuevo.");
+            }
+          });
+        },
+        error: (error: any) => {
+          console.error("Error al leer el archivo CSV:", error);
+          alert("Error al leer el archivo CSV, intenta de nuevo.");
+        }
+      });
+    }
   }
 }

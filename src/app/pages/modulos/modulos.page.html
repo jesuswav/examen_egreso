@@ -1,0 +1,36 @@
+<ion-content>
+  <div class="container">
+    <div class="left-column">
+      <ion-card class="large-card">
+        <ion-card-header>
+          <ion-card-title>Registrar Nuevo Módulo</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+          
+            <ion-input placeholder="Nombre del Modulo" type="text" [(ngModel)]="data.modulo" required></ion-input>
+          </ion-item>
+          <ion-button expand="full" (click)="addModulo()">Registrar Módulo</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+    <div class="right-column">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Lista de Módulos</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item *ngFor="let modulo of modulos">
+              <ion-label>
+                <h2>{{ modulo.modulo }}</h2>
+              </ion-label>
+              <ion-button (click)="editModulo(modulo)">Editar</ion-button>
+              <ion-button color="danger" (click)="deleteModulo(modulo.idModulo)">Eliminar</ion-button>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

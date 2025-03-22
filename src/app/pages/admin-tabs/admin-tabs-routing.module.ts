@@ -16,8 +16,16 @@ const routes: Routes = [
         loadChildren: () => import('../question-bank/question-bank.page').then(m => m.QuestionBankPage)
       },
       {
+        path: 'modulos',
+        loadChildren: () => import('../modulos/modulos.page').then(m => m.ModulosPage)
+      },
+      {
         path: 'resultados',
         loadChildren: () => import('../resultados/resultados.page').then(m => m.ResultadosPage)
+      },
+      {
+        path: 'asignacion',
+        loadChildren: () => import('../asignacion/asignacion.page').then(m => m.AsignacionPage)
       },
       {
         path: '',
