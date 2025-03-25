@@ -1,26 +1,17 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
+  FormsModule,
+  FormBuilder,
+  FormControl,
+  ReactiveFormsModule,
+  FormGroup,
+} from '@angular/forms';
+import {
   IonItem,
   IonLabel,
-  IonInput,
   IonButton,
-  IonSelect,
-  IonSelectOption,
   IonList,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonBadge,
   IonRadio,
   IonRadioGroup,
 } from '@ionic/angular/standalone';
@@ -43,6 +34,8 @@ import { SaveAnswersModalComponent } from '../save-answers-modal/save-answers-mo
     IonButton,
     IonRadio,
     IonRadioGroup,
+    ReactiveFormsModule,
+    CommonModule,
   ],
   templateUrl: './question.component.html',
   styleUrls: ['./question.component.scss'],
@@ -53,18 +46,82 @@ export class QuestionComponent implements OnInit {
   respuestas: string[] = new Array(this.preguntas.length).fill('');
   answers: any[] = [];
 
+  // instancia del formulario
+  preguntass: any[] = [];
+  formulario: FormGroup;
+
   constructor(
     private authService: AuthService,
     private globalStateService: GlobalStateService,
-    public dialog: MatDialog
-  ) {}
+    public dialog: MatDialog,
+    private fb: FormBuilder
+  ) {
+    this.formulario = this.fb.group({});
+  }
 
   ngOnInit() {
-    console.log('Pregunta: ', this.preguntas);
+    this.cargarPreguntas();
+  }
+
+  // función para cargar las preguntas
+  cargarPreguntas(): void {
+    // Datos de ejemplo
+    const modulo = this.globalStateService.getModulo();
+
+    this.authService.getPreguntas(modulo).subscribe({
+      next: (res: any) => {
+        this.preguntass = res;
+
+        // crear los controladores para las preguntas
+        this.preguntass.forEach((pregunta) => {
+          if (pregunta) {
+            console.log('controlador agregado..');
+            this.formulario.addControl(
+              `pregunta_${pregunta.idPregunta}`,
+              this.fb.control('')
+            );
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error al obtener las preguntas:', error);
+      },
+    });
+  }
+
+  guardarRespuestas(): void {
+    // Obtén los valores del formulario
+    console.log('RESPUESTAS GUARDADAS')
+    console.log(this.formulario.value);
+
+    let respuestasO = this.formulario.value;
+    let respuestasA: any[] = [];
+
+    for (const respuesta in respuestasO) {
+      console.log(respuesta);
+      if (respuestasO.hasOwnProperty(respuesta)) {
+        // Filtra solo propiedades propias (no heredadas)
+        console.log(`Clave: ${respuesta}, Valor: ${respuestasO[respuesta]}`);
+
+        const idPregunta = respuesta.split('_').pop(); // "23"
+
+        console.log(idPregunta);
+        respuestasA.push({
+          idPregunta: idPregunta,
+          respuesta: respuestasO[respuesta],
+          idUsuario: this.globalStateService.getUsuario(),
+          idModulo: this.globalStateService.getModulo(),
+        });
+      }
+    }
+
+    console.log(respuestasA)
+    this.globalStateService.setRespuestasArray(respuestasA)
   }
 
   // función para abrir el modal antes de registrar las respuestas de manera definitiva
   openModal(): void {
+    this.guardarRespuestas()
     const dialogRef = this.dialog.open(SaveAnswersModalComponent, {
       width: '400px', // Ancho del modal
       data: {
@@ -77,34 +134,5 @@ export class QuestionComponent implements OnInit {
       // Puedes manejar el resultado aquí
       //this.comenzarExamen()
     });
-  }
-
-  guardarRespuestas(): void {
-    console.log(this.respuestas);
-    console.log(this.preguntas);
-    this.respuestas.forEach((item, index) => {
-      console.log(item);
-      this.answers.push({
-        idPregunta: index,
-        idUsuario: this.globalStateService.getUsuario(),
-        idModulo: this.globalStateService.getModulo(),
-        respuesta: item,
-      });
-    });
-    console.log('Anwers: ', this.answers);
-    if (this.respuestas.every((respuesta) => respuesta !== '')) {
-      console.log('Respuestas guardadas:', this.respuestas);
-      this.authService.saveAnswers(this.answers).subscribe({
-        next: (res: any) => {
-          console.log(res);
-        },
-        error: (error) => {
-          console.error('Error al obtener las preguntas:', error);
-        },
-      });
-      // Aquí puedes enviar las respuestas a un servicio o hacer lo que necesites
-    } else {
-      console.log('Por favor, responde todas las preguntas.');
-    }
   }
 }

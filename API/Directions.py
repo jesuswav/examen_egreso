@@ -144,7 +144,7 @@ def getPreguntas():
         # ejecutar consulta
         if idModulo:
             result = execute_query("""
-                SELECT preguntas.idPregunta, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuestaCorrecta, modulos.modulo AS modulo
+                SELECT preguntas.idPregunta, preguntas.isPreguntaAbierta, preguntas.pregunta, preguntas.respuesta1, preguntas.respuesta2, preguntas.respuesta3, preguntas.respuesta4, preguntas.respuestaCorrecta, modulos.modulo AS modulo
                 FROM preguntas
                 JOIN modulos ON preguntas.idModulo = modulos.idModulo
                 WHERE preguntas.idModulo = %s
@@ -156,7 +156,27 @@ def getPreguntas():
                 JOIN modulos ON preguntas.idModulo = modulos.idModulo
             """)
             print('Hola')
-        return jsonify(result)
+
+        response = []
+
+        for pregunta in result:
+            opciones = [
+                {"idOpcion": 1, "texto": pregunta['respuesta1'], "value": "a"}, 
+                {"idOpcion": 2, "texto": pregunta['respuesta2'], "value": "b"}, 
+                {"idOpcion": 3, "texto": pregunta['respuesta3'], "value": "c"}, 
+                {"idOpcion": 4, "texto": pregunta['respuesta4'], "value": "d"}]
+            print(opciones)
+            response.append({
+                "idPregunta": pregunta['idPregunta'],
+                "isPreguntaAbierta": pregunta['isPreguntaAbierta'],
+                "pregunta": pregunta['pregunta'],
+                "opciones": opciones,
+                "respuestaCorrecta": pregunta['respuestaCorrecta'],
+                "modulo": pregunta['modulo']
+            })
+         
+        
+        return jsonify(response)
     except Exception as e:
         print("Error en getPreguntas: ", e)
         return jsonify({"error": "Error en getPreguntas"})
@@ -276,6 +296,7 @@ def updatePregunta(id):
     except Exception as e:
         print("Error en updatePregunta: ", e)
         return jsonify({"error": "Error en updatePregunta"})
+        
 
 @app.route('/getRoles', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
@@ -455,13 +476,10 @@ def assignExamen():
         idModulo4 = data.get('idModulo4')
         idModulo5 = data.get('idModulo5')
         
-        cur = mysql.connection.cursor()
-        cur.execute("""
+        execute_query("""
             INSERT INTO examen (idCarrera, idModulo1, idModulo2, idModulo3, idModulo4, idModulo5)
             VALUES (%s, %s, %s, %s, %s, %s)
         """, (idCarrera, idModulo1, idModulo2, idModulo3, idModulo4, idModulo5))
-        mysql.connection.commit()
-        cur.close()
         
         return jsonify({"message": "Examen asignado correctamente"})
     except Exception as e:
@@ -472,8 +490,7 @@ def assignExamen():
 @cross_origin(allow_headers=['Content-Type'])
 def getExamenDetails(idExamen):
     try:
-        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("""
+        result = execute_query("""
             SELECT e.idExamen, c.carrera, m1.modulo as modulo1Nombre, m2.modulo as modulo2Nombre, 
                    m3.modulo as modulo3Nombre, m4.modulo as modulo4Nombre, m5.modulo as modulo5Nombre
             FROM examen e
@@ -484,9 +501,7 @@ def getExamenDetails(idExamen):
             JOIN modulos m4 ON e.idModulo4 = m4.idModulo
             JOIN modulos m5 ON e.idModulo5 = m5.idModulo
             WHERE e.idExamen = %s
-        """, (idExamen,))
-        result = cur.fetchone()
-        cur.close()
+        """, (idExamen))
         return jsonify(result)
     except Exception as e:
         print("Error en getExamenDetails: ", e)

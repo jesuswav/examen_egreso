@@ -9,6 +9,7 @@ export class GlobalStateService {
   private idUsuario: number = 0;
   private idModulo: number = 0;
   private examen: any[] = [];
+  private respuestasArray: any[] = [];
 
   // manejo del usuario
   getUsuario(): number {
@@ -32,5 +33,13 @@ export class GlobalStateService {
   }
   setExamen(newValue: any) {
     this.examen = newValue;
+  }
+
+  // manejo de las respuestas enviadas por medio del modal
+  getRespuestasArray(): any {
+    return this.respuestasArray;
+  }
+  setRespuestasArray(respuestasArray: any[]) {
+    this.respuestasArray = respuestasArray
   }
 }

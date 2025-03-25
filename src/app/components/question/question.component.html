@@ -1,33 +1,31 @@
 <ion-list class="question-container">
-  @for (pregunta of preguntas; track pregunta.idPregunta) {
-  <ion-item>
-    <ion-label>
-      <h2>{{ pregunta.pregunta }}</h2>
-      <p>Respuestas:</p>
-      <ion-radio-group [(ngModel)]="respuestas[pregunta.idPregunta]">
-        <ion-item>
-          <ion-label>A. {{ pregunta.respuesta1 }}</ion-label>
-          <ion-radio slot="start" value="A"></ion-radio>
-        </ion-item>
-        <ion-item>
-          <ion-label>B. {{ pregunta.respuesta2 }}</ion-label>
-          <ion-radio slot="start" value="B"></ion-radio>
-        </ion-item>
-        <ion-item>
-          <ion-label>C. {{ pregunta.respuesta3 }}</ion-label>
-          <ion-radio slot="start" value="C"></ion-radio>
-        </ion-item>
-        <ion-item>
-          <ion-label>D. {{ pregunta.respuesta4 }}</ion-label>
-          <ion-radio slot="start" value="D"></ion-radio>
-        </ion-item>
-      </ion-radio-group>
-    </ion-label>
-  </ion-item>
-  }
+  <!-- En el template -->
+  <form [formGroup]="formulario" (ngSubmit)="openModal()">
+    @for (pregunta of preguntass; track pregunta.idPregunta) {
+    <div>
+      @if (pregunta.isPreguntaAbierta) {
+      <div>
+        <label>{{ pregunta.pregunta }}</label>
+        <input [formControlName]="'pregunta_' + pregunta.idPregunta" />
+      </div>
+      } @if (!pregunta.isPreguntaAbierta) {
+      <div class="option-container">
+        <label>{{ pregunta.pregunta }}</label>
+        <ion-radio-group [formControlName]="'pregunta_' + pregunta.idPregunta">
+          @for (opcion of pregunta.opciones; track opcion.idOpcion) {
+          <ion-item>
+            <ion-label>{{ opcion.texto }}</ion-label>
+            <ion-radio slot="start" [value]="opcion.value"></ion-radio>
+          </ion-item>
+          }
+        </ion-radio-group>
+      </div>
+      }
+    </div>
+    }
+    <button type="submit">Enviar</button>
+    <!-- <ion-button expand="full"  (click)="openModal()">Guardar Respuestas</ion-button> -->
+  </form>
 </ion-list>
 
 <!-- Botón para guardar las respuestas -->
-<ion-button expand="full" (click)="openModal()"
-  >Guardar Respuestas</ion-button
->
