@@ -156,7 +156,27 @@ def getPreguntas():
                 JOIN modulos ON preguntas.idModulo = modulos.idModulo
             """)
             print('Hola')
-        return jsonify(result)
+
+        response = []
+
+        for pregunta in result:
+            opciones = [
+                {"idOpcion": 1, "texto": pregunta['respuesta1'], "value": "a"}, 
+                {"idOpcion": 2, "texto": pregunta['respuesta2'], "value": "b"}, 
+                {"idOpcion": 3, "texto": pregunta['respuesta3'], "value": "c"}, 
+                {"idOpcion": 4, "texto": pregunta['respuesta4'], "value": "d"}]
+            print(opciones)
+            response.append({
+                "idPregunta": pregunta['idPregunta'],
+                "isPreguntaAbierta": pregunta['isPreguntaAbierta'],
+                "pregunta": pregunta['pregunta'],
+                "opciones": opciones,
+                "respuestaCorrecta": pregunta['respuestaCorrecta'],
+                "modulo": pregunta['modulo']
+            })
+         
+        
+        return jsonify(response)
     except Exception as e:
         print("Error en getPreguntas: ", e)
         return jsonify({"error": "Error en getPreguntas"})
